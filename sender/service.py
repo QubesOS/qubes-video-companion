@@ -11,6 +11,7 @@
 
 import sys
 import struct
+import os
 from typing import Optional, NoReturn
 
 import gi
@@ -126,6 +127,8 @@ class Service(object):
         target_domain = qubesdb.QubesDB().read('/name')
         if target_domain is None:
             # dom0 doesn't have a /name value in its QubesDB
+            if not os.path.exists('/etc/qubes-release'):
+                raise OSError('cannot obtain name of this qube')
             target_domain = 'dom0'
         else:
             target_domain = target_domain.decode('ascii', 'strict')
