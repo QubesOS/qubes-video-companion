@@ -63,7 +63,7 @@ Simply run the following command in the virtual machine of the screen sharing re
 
 `qubes-video-companion screenshare`
 
-A secure confirmation dialog will appear asking where the screen to share is to be sourced from. Select any qube as the target screen, this could be a regular unprivileged qube such as `personal` or a [DisposableVM](https://www.qubes-os.org/doc/disposablevm/), or the ultimately trusted `dom0` (caution is advised to avoid information disclosure. Afterwards, confirm the operation by clicking `OK`.
+A secure confirmation dialog will appear asking where the screen to share is to be sourced from. Select any qube as the target screen, this could be a regular unprivileged qube such as `personal` or a [DisposableVM](https://www.qubes-os.org/doc/disposablevm/), or the ultimately trusted `dom0` (caution is advised to avoid information disclosure). Afterwards, confirm the operation by clicking `OK`.
 
 Note that confirmation isn't required when a VM wants to view the screen of a DisposableVM it launched itself because the parent VM already has full control over the DisposableVM.
 
@@ -98,6 +98,7 @@ Here is a review of the security concerns webcams entail that Qubes users either
     - Only high quality and robust GStreamer ["Base" and "Good" plugins](https://gitlab.freedesktop.org/gstreamer/gstreamer/-/raw/master/README) are used to minimize the possibility of bugs
         - Additionally, only the most common and battle-hardened GStreamer components and formats are used
     - Any complex operations (such as video conversions where necessary) are done on the side of the sending machine where the video data is still inherently trusted
+        - This does not include any compression that may be done by the application using the video.  That is the responsibility of said application.
     - Only small parts of two kernel modules ever touch untrusted video data: [`v4l2loopback`](https://github.com/umlaeute/v4l2loopback) and the Video4Linux2 (V4L2) driver in mainline Linux
         - This is a massive improvement to what it would have been previously using USBIP over Qubes RPC for passing through a USB webcam device thereby exposing the entire Linux USB stack to a potential attacker
     - Kernel modules are reloaded between Qubes Video Companion sessions to ensure a clean state

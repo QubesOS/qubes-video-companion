@@ -3,6 +3,7 @@
 ## -q (quiet)
 ### gst-launch-1.0 needs to be quiet because the debug messages are printed on standard output instead of standard error
 - This means the debug info will become part of the video output upon being sent to the `fdsink` element which is unwanted behavior that results in video artifacts
+- Now fixed by using a Python script instead of the command-line tool
 
 ## queue
 ### Force push mode scheduling which is better for a constant stream of data
@@ -59,5 +60,6 @@
         - Timestamping is done on raw video in the GStreamer pipeline but once it leaves there (through `fdsink`) any timestamping information may be void (unsure)
         - Although, research has found a few somewhat hacky solutions for FFmpeg that allowed for timestamping on raw video; perhaps GStreamer has something similar
 - Or maybe we could synchronize the clocks of the machines better thus allowing us to remove `sync=false`
+    - Probably a good idea for Qubes OS in general :)
     - Or even just synchronize the clocks that the GStreamer processes see on each machine right before running them
         - Perhaps using the `datefudge` or `faketime` command which uses `LD_PRELOAD` to manipulate the system time for a given command
