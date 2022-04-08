@@ -48,7 +48,7 @@ verify_git_obj () {
     newsig_number=$(printf %s\\n "$content" | grep -c '^\[GNUPG:] NEWSIG') &&
     [ "$newsig_number" = 1 ] && {
         printf %s\\n "$content" |
-        grep -q "^\\[GNUPG:] VALIDSIG $author_fpr "
+        grep -c "^\\[GNUPG:] VALIDSIG $author_fpr " > /dev/null
     }
 }
 
