@@ -17,7 +17,7 @@ from service import Service
 class ScreenShare(Service):
     """Screen sharing video souce class"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.main(self)
 
     def video_source(self) -> str:
@@ -26,13 +26,15 @@ class ScreenShare(Service):
     def icon(self) -> str:
         return 'video-display'
 
-    def parameters(self):
+    def parameters(self) -> tuple[int, int, int]:
         monitor = Gdk.Display().get_default().get_monitor(0)
         scale, geometry = monitor.get_scale_factor(), monitor.get_geometry()
         return (scale * geometry.width, scale * geometry.height, 30)
 
-    def pipeline(self, width: int, height: int, fps: int):
-        caps = ('width={0},'
+    def pipeline(self, width: int, height: int, fps: int) -> list[str]:
+        caps = ('colorimetry=2:4:7:1,'
+                'chroma-site=none,'
+                'width={0},'
                 'height={1},'
                 'framerate={2}/1,'
                 'interlace-mode=progressive,'
@@ -46,12 +48,12 @@ class ScreenShare(Service):
             'queue',
             '!',
             'capsfilter',
-            'caps=video/x-raw,format=BGRx,colorimetry=2:4:7:1,chroma-site=none,' + caps,
+            'caps=video/x-raw,format=BGRx,' + caps,
             '!',
             'videoconvert',
             '!',
             'capsfilter',
-            'caps=video/x-raw,format=I420,colorimetry=2:4:7:1,chroma-site=none,' + caps,
+            'caps=video/x-raw,format=I420,' + caps,
             '!',
             'fdsink',
         ]

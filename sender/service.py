@@ -34,7 +34,8 @@ class Service(object):
         self._quitting = False
         self._element = None
         icon = self.icon()
-        msg = self.video_source() + ': ' + target_domain + ' → ' + remote_domain
+        # use a Unicode arrow for better UX
+        msg = self.video_source() + ': ' + target_domain + ' \u21d2 ' + remote_domain
 
         app = "Qubes Video Companion"
         Notify.init(app)
@@ -54,13 +55,13 @@ class Service(object):
         """
         raise NotImplementedError("Pure virtual method called!")
 
-    def pipeline(self, width: int, height: int, fps: int):
+    def pipeline(self, width: int, height: int, fps: int) -> list[str]:
         """
         Return a set-up GStreamer pipeline
         """
         raise NotImplementedError("Pure virtual method called!")
 
-    def parameters(self):
+    def parameters(self) -> tuple[int, int, int]:
         """
         Compute the parameters.  Return a (width, height, fps) tuple.
         """
