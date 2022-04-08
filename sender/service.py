@@ -123,11 +123,12 @@ class Service(object):
         import argparse, qubesdb, os
         argparse.ArgumentParser().parse_args()
 
-        try:
-            target_domain = qubesdb.QubesDB().read('/name').decode('ascii', 'strict')
-        except:
+        target_domain = qubesdb.QubesDB().read('/name')
+        if target_domain is None:
             # dom0 doesn't have a /name value in its QubesDB
             target_domain = 'dom0'
+        else:
+            target_domain = target_domain.decode('ascii', 'strict')
         remote_domain = os.getenv('QREXEC_REMOTE_DOMAIN')
 
         self.validate_qube_names(target_domain, remote_domain)
