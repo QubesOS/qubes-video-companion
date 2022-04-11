@@ -4,4 +4,4 @@
 	dh $@
 
 override_dh_auto_install:
-	DESTDIR=$(readlink -f .) && make install-vm "DESTDIR=$$DESTDIR/debian/qubes-video-companion"
+	DESTDIR=$$(readlink -f .) && make install-vm "DESTDIR=$$DESTDIR/debian/qubes-video-companion"
