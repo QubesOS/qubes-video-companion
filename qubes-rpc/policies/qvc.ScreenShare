@@ -1,4 +1,5 @@
 # Policy for Qubes Video Companion, R4.0 syntax
-@anyvm  @dispvm allow
-@anyvm	@anyvm	ask
-@anyvm	dom0 ask
+@anyvm  @dispvm  allow
+@anyvm  @default ask
+@anyvm  @anyvm   ask
+@anyvm  dom0     ask

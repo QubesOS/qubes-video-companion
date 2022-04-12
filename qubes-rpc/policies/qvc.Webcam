@@ -1,3 +1,4 @@
 # Policy for Qubes Video Companion, R4.0 syntax
-@anyvm	sys-usb	ask
-@anyvm	dom0 ask
+@anyvm  @default ask
+@anyvm  sys-usb  ask
+@anyvm  dom0     ask
