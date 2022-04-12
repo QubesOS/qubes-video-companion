@@ -9,15 +9,15 @@ set -E # Enable function inheritance of traps
 trap exit ERR
 
 usage() {
-    echo "Usage: qubes-video-companion webcam|screenshare qube"
+    echo "Usage: qubes-video-companion webcam|screenshare [destination qube]"
 } >&2
 
-if [ "$#" -ne 2 ]; then
+if [ "$#" -gt 2 ] && [ "$#" -lt 1 ]; then
     usage
     exit 1
 fi
 
-video_source="$1" qube="$2"
+video_source="$1" qube=${2-'@default'}
 
 case "$video_source" in
     webcam)
