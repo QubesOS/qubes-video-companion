@@ -1,26 +1,29 @@
-# Copyright (C) 2021 Elliot Killick <elliotkillick@zohomail.eu>
-# Licensed under the MIT License. See LICENSE file for details.
-
-stages:
-  - Static Analysis
-
-shellcheck:
-  image: koalaman/shellcheck-alpine:latest
-  stage: Static Analysis
-  before_script:
-    - shellcheck --version
+checks:shellcheck:
+  stage: checks
+  tags:
+    - docker
   script:
-    - find ./ -type f -name '*.sh' | xargs shellcheck --external-sources --source-path=SCRIPTDIR
-    - find ./qubes-rpc/services -type f -name '*' | xargs shellcheck --external-sources --source-path=SCRIPTDIR
+    - shellcheck -x -e SC1117 $(grep -l '^#!/bin/\(ba\)\?sh' $(sudo git ls-files))
 
-pylint:
-  image: python:latest
-  stage: Static Analysis
-  before_script:
-    - python --version
-    - pip --version
-    - pip install pylint
-    - pylint --version
-    - pip install -r ci/requirements.txt
+checks:pylint:
+  stage: checks
+  tags:
+    - docker
   script:
-    - find ./ -type f -name '*.py' | xargs pylint --exit-zero
+    - find ./ -type f -name '*.py' | xargs pylint-3 --exit-zero
+
+include:
+- file: /r4.1/gitlab-base.yml
+  project: QubesOS/qubes-continuous-integration
+- file: /r4.1/gitlab-dom0.yml
+  project: QubesOS/qubes-continuous-integration
+- file: /r4.1/gitlab-vm-fedora.yml
+  project: QubesOS/qubes-continuous-integration
+- file: /r4.1/gitlab-vm-debian.yml
+  project: QubesOS/qubes-continuous-integration
+- file: /r4.2/gitlab-base.yml
+  project: QubesOS/qubes-continuous-integration
+- file: /r4.2/gitlab-host.yml
+  project: QubesOS/qubes-continuous-integration
+- file: /r4.2/gitlab-vm.yml
+  project: QubesOS/qubes-continuous-integration
