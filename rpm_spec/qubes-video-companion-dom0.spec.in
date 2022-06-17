@@ -4,7 +4,7 @@
 %define vm_name qubes-video-companion
 
 Name:           %{vm_name}-dom0
-Version:        1.0.0
+Version:        2.0.1
 Release:        1%{?dist}
 Summary:        Securely stream webcams and share screens across virtual machines
 
