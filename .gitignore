@@ -1,3 +1,5 @@
 *.swp
 *.gz
 __pycache__
+pkgs
+debian/changelog.*

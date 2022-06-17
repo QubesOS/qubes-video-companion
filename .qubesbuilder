@@ -1,0 +1,11 @@
+host:
+  rpm:
+    build:
+    - rpm_spec/qubes-video-companion-dom0.spec
+vm:
+  rpm:
+    build:
+    - rpm_spec/qubes-video-companion.spec
+  deb:
+    build:
+    - debian

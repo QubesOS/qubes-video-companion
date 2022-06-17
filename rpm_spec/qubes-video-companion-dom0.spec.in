@@ -4,8 +4,8 @@
 %define vm_name qubes-video-companion
 
 Name:           %{vm_name}-dom0
-Version:        1.0.0
-Release:        1%{?dist}
+Version:        @VERSION@
+Release:        @REL@%{?dist}
 Summary:        Securely stream webcams and share screens across virtual machines
 
 License:        MIT
@@ -13,6 +13,8 @@ URL:            https://github.com/elliotkillick/qubes-video-companion
 Source0:        %{vm_name}-%{version}.tar.gz
 
 BuildArch:      noarch
+
+BuildRequires:  make
 
 Requires:       gstreamer1-plugins-good
 
@@ -22,7 +24,7 @@ screens across virtual machines.
 
 It accomplishes this by creating a uni-directional flow of raw video that is
 passed from one virtual machine to another through file descriptors thereby
-allowing both machines to be completely air-gapped with no networking stacks
+allowing both machines to be completely air-gaped with no networking stacks
 exposed. This design makes the side of the video sending virtual machine 100%
 immune to attack and only leaves a very small attack surface on the side of
 the video receiving virtual machine.
@@ -63,5 +65,4 @@ make DESTDIR=%{?buildroot} install-dom0 install-license
 %{_datadir}/qubes-video-companion/sender/tray_icon.py
 
 %changelog
-* Wed Feb 17 2021 Elliot Killick <elliotkillick@zohomail.eu> 1.0.0-1
-- Initial release of the package
+@CHANGELOG@

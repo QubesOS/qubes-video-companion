@@ -2,8 +2,8 @@
 # Licensed under the MIT License. See LICENSE file for details.
 
 Name:           qubes-video-companion
-Version:        1.0.0
-Release:        1%{?dist}
+Version:        @VERSION@
+Release:        @REL@%{?dist}
 Summary:        Securely stream webcams and share screens across virtual machines
 
 License:        MIT
@@ -13,6 +13,7 @@ Source0:        %{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 BuildRequires:  pandoc
+BuildRequires:  make
 Requires:       qubes-video-companion-sender
 Requires:       qubes-video-companion-receiver
 Requires:       qubes-video-companion-license
@@ -41,12 +42,12 @@ screens across virtual machines.
 
 It accomplishes this by creating a uni-directional flow of raw video that is
 passed from one virtual machine to another through file descriptors thereby
-allowing both machines to be completely air-gapped with no networking stacks
+allowing both machines to be completely air-gaped with no networking stacks
 exposed. This design makes the side of the video sending virtual machine 100%
 immune to attack and only leaves a very small attack surface on the side of
 the video receiving virtual machine.
 
-The project emphasizes correctness and security all thae while also sporting
+The project emphasizes correctness and security all the while also sporting
 superb performance by maintaining a small footprint of the available
 computational resources and low latency even at Full HD and greater
 resolutions at 30 or more frames per second.
@@ -77,12 +78,12 @@ screens across virtual machines.
 
 It accomplishes this by creating a uni-directional flow of raw video that is
 passed from one virtual machine to another through file descriptors thereby
-allowing both machines to be completely air-gapped with no networking stacks
+allowing both machines to be completely air-gaped with no networking stacks
 exposed. This design makes the side of the video sending virtual machine 100%
 immune to attack and only leaves a very small attack surface on the side of
 the video receiving virtual machine.
 
-The project emphasizes correctness and security all thae while also sporting
+The project emphasizes correctness and security all the while also sporting
 superb performance by maintaining a small footprint of the available
 computational resources and low latency even at Full HD and greater
 resolutions at 30 or more frames per second.
@@ -106,12 +107,12 @@ screens across virtual machines.
 
 It accomplishes this by creating a uni-directional flow of raw video that is
 passed from one virtual machine to another through file descriptors thereby
-allowing both machines to be completely air-gapped with no networking stacks
+allowing both machines to be completely air-gaped with no networking stacks
 exposed. This design makes the side of the video sending virtual machine 100%
 immune to attack and only leaves a very small attack surface on the side of
 the video receiving virtual machine.
 
-The project emphasizes correctness and security all thae while also sporting
+The project emphasizes correctness and security all the while also sporting
 superb performance by maintaining a small footprint of the available
 computational resources and low latency even at Full HD and greater
 resolutions at 30 or more frames per second.
@@ -130,12 +131,12 @@ screens across virtual machines.
 
 It accomplishes this by creating a uni-directional flow of raw video that is
 passed from one virtual machine to another through file descriptors thereby
-allowing both machines to be completely air-gapped with no networking stacks
+allowing both machines to be completely air-gaped with no networking stacks
 exposed. This design makes the side of the video sending virtual machine 100%
 immune to attack and only leaves a very small attack surface on the side of
 the video receiving virtual machine.
 
-The project emphasizes correctness and security all thae while also sporting
+The project emphasizes correctness and security all the while also sporting
 superb performance by maintaining a small footprint of the available
 computational resources and low latency even at Full HD and greater
 resolutions at 30 or more frames per second.
@@ -155,5 +156,4 @@ make 'DESTDIR=%{?buildroot}' install-vm install-license
 
 
 %changelog
-* Wed Feb 17 2021 Elliot Killick <elliotkillick@zohomail.eu> 1.0.0-1
-- Initial release of the package
+@CHANGELOG@
