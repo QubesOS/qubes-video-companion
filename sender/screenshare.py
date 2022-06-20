@@ -10,9 +10,11 @@
 # pylint: disable=wrong-import-position
 
 import gi
-gi.require_version('Gdk', '3.0')
+
+gi.require_version("Gdk", "3.0")
 from gi.repository import Gdk
 from service import Service
+
 
 class ScreenShare(Service):
     """Screen sharing video souce class"""
@@ -21,10 +23,10 @@ class ScreenShare(Service):
         self.main(self)
 
     def video_source(self) -> str:
-        return 'screenshare'
+        return "screenshare"
 
     def icon(self) -> str:
-        return 'video-display'
+        return "video-display"
 
     def parameters(self) -> tuple[int, int, int]:
         monitor = Gdk.Display().get_default().get_monitor(0)
@@ -32,31 +34,34 @@ class ScreenShare(Service):
         return (scale * geometry.width, scale * geometry.height, 30)
 
     def pipeline(self, width: int, height: int, fps: int) -> list[str]:
-        caps = ('colorimetry=2:4:7:1,'
-                'chroma-site=none,'
-                'width={0},'
-                'height={1},'
-                'framerate={2}/1,'
-                'interlace-mode=progressive,'
-                'pixel-aspect-ratio=1/1,'
-                'max-framerate={2}/1,'
-                'views=1'.format(width, height, fps))
+        caps = (
+            "colorimetry=2:4:7:1,"
+            "chroma-site=none,"
+            "width={0},"
+            "height={1},"
+            "framerate={2}/1,"
+            "interlace-mode=progressive,"
+            "pixel-aspect-ratio=1/1,"
+            "max-framerate={2}/1,"
+            "views=1".format(width, height, fps)
+        )
         return [
-            'ximagesrc',
-            'use-damage=false',
-            '!',
-            'queue',
-            '!',
-            'capsfilter',
-            'caps=video/x-raw,format=BGRx,' + caps,
-            '!',
-            'videoconvert',
-            '!',
-            'capsfilter',
-            'caps=video/x-raw,format=I420,' + caps,
-            '!',
-            'fdsink',
+            "ximagesrc",
+            "use-damage=false",
+            "!",
+            "queue",
+            "!",
+            "capsfilter",
+            "caps=video/x-raw,format=BGRx," + caps,
+            "!",
+            "videoconvert",
+            "!",
+            "capsfilter",
+            "caps=video/x-raw,format=I420," + caps,
+            "!",
+            "fdsink",
         ]
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     screenshare = ScreenShare()

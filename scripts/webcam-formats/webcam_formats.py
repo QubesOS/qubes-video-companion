@@ -8,7 +8,8 @@
 import subprocess
 from collections import OrderedDict
 
-class WebcamFormats():
+
+class WebcamFormats:
     """
     Parse supported webcam formats
 
@@ -139,12 +140,25 @@ class WebcamFormats():
     def configure_webcam_best_format(self):
         """Configure webcam device to use the best format"""
 
-        if self.selected_format == "" or self.selected_size == tuple() \
-                or self.selected_fps == 0:
+        if (
+            self.selected_format == ""
+            or self.selected_size == tuple()
+            or self.selected_fps == 0
+        ):
             self.find_best_format()
 
-        subprocess.run(['v4l2-ctl', '--device', self.video_device,
-                        '--set-fmt-video', 'pixelformat=' +
-                        self.selected_format +
-                        ',width=' + str(self.selected_size[0]) + ',height=' +
-                        str(self.selected_size[1])], check=True)
+        subprocess.run(
+            [
+                "v4l2-ctl",
+                "--device",
+                self.video_device,
+                "--set-fmt-video",
+                "pixelformat="
+                + self.selected_format
+                + ",width="
+                + str(self.selected_size[0])
+                + ",height="
+                + str(self.selected_size[1]),
+            ],
+            check=True,
+        )

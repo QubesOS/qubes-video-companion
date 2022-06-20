@@ -16,19 +16,20 @@ from typing import Optional, NoReturn
 
 import gi
 
-gi.require_version('Gtk', '3.0')
-gi.require_version('Gst', '1.0')
-gi.require_version('Notify', '0.7')
+gi.require_version("Gtk", "3.0")
+gi.require_version("Gst", "1.0")
+gi.require_version("Notify", "0.7")
 from gi.repository import Gtk, Gst, Notify
 
 import tray_icon
 
+
 class Service:
     """Qubes Video Companion service base class"""
 
-    _quitting = None # type: bool
-    _element = None # type: Optional[Gst.Element]
-    _tray_icon = None # type: tray_icon.TrayIcon
+    _quitting = None  # type: bool
+    _element = None  # type: Optional[Gst.Element]
+    _tray_icon = None  # type: tray_icon.TrayIcon
 
     def start_service(self, target_domain: str, remote_domain: str) -> None:
         """Start video sender service"""
@@ -37,8 +38,13 @@ class Service:
         self._element = None
         icon = self.icon()
         # use a Unicode arrow for better UX
-        msg = self.video_source() + ': ' + target_domain + ' \u21d2 ' \
-              + remote_domain
+        msg = (
+            self.video_source()
+            + ": "
+            + target_domain
+            + " \u21d2 "
+            + remote_domain
+        )
 
         app = "Qubes Video Companion"
         Notify.init(app)
@@ -83,13 +89,13 @@ class Service:
         """Handle pipeline messages"""
 
         if msg.type == Gst.MessageType.EOS:
-            print('End of stream, exiting', file=sys.stderr)
+            print("End of stream, exiting", file=sys.stderr)
             self.quit()
         elif msg.type == Gst.MessageType.ERROR:
-            print('Fatal error:', msg.parse_error(), file=sys.stderr)
+            print("Fatal error:", msg.parse_error(), file=sys.stderr)
             self.quit()
         elif msg.type == Gst.MessageType.CLOCK_LOST:
-            print('Clock lost, resetting', file=sys.stderr)
+            print("Clock lost, resetting", file=sys.stderr)
             self._element.set_state(Gst.State.PAUSED)
             self._element.set_state(Gst.State.PLAYING)
 
@@ -97,28 +103,33 @@ class Service:
     def validate_qube_names(target_domain: str, remote_domain: str) -> NoReturn:
         import re
 
-        qube_re = re.compile('^[A-Za-z][A-Za-z0-9_-]{1,30}$')
+        qube_re = re.compile("^[A-Za-z][A-Za-z0-9_-]{1,30}$")
         if not qube_re.match(target_domain):
-            print('Invalid target qube name %r, failing' % target_domain,
-                  file=sys.stderr)
+            print(
+                "Invalid target qube name %r, failing" % target_domain,
+                file=sys.stderr,
+            )
             sys.exit(1)
         if not qube_re.match(remote_domain):
-            print('Invalid remote qube name %r, failing' % remote_domain,
-                  file=sys.stderr)
+            print(
+                "Invalid remote qube name %r, failing" % remote_domain,
+                file=sys.stderr,
+            )
             sys.exit(1)
 
     def start_transmission(self) -> None:
         """Start video transmission"""
 
         width, height, fps = self.parameters()
-        sys.stdout.buffer.write(struct.pack('=HHH', width, height, fps))
+        sys.stdout.buffer.write(struct.pack("=HHH", width, height, fps))
         sys.stdout.buffer.flush()
         Gst.init()
         element = self._element = Gst.parse_launchv(
-            self.pipeline(width, height, fps))
+            self.pipeline(width, height, fps)
+        )
         bus = element.get_bus()
         bus.add_signal_watch()
-        bus.connect('message', self.msg_handler)
+        bus.connect("message", self.msg_handler)
         element.set_state(Gst.State.PLAYING)
 
     @classmethod
@@ -127,17 +138,18 @@ class Service:
 
         import argparse
         import qubesdb
+
         argparse.ArgumentParser().parse_args()
 
-        target_domain = qubesdb.QubesDB().read('/name')
+        target_domain = qubesdb.QubesDB().read("/name")
         if target_domain is None:
             # dom0 doesn't have a /name value in its QubesDB
-            if not os.path.exists('/etc/qubes-release'):
-                raise OSError('cannot obtain name of this qube')
-            target_domain = 'dom0'
+            if not os.path.exists("/etc/qubes-release"):
+                raise OSError("cannot obtain name of this qube")
+            target_domain = "dom0"
         else:
-            target_domain = target_domain.decode('ascii', 'strict')
-        remote_domain = os.getenv('QREXEC_REMOTE_DOMAIN')
+            target_domain = target_domain.decode("ascii", "strict")
+        remote_domain = os.getenv("QREXEC_REMOTE_DOMAIN")
 
         self.validate_qube_names(target_domain, remote_domain)
 

@@ -15,19 +15,20 @@ from os import _exit
 from typing import NoReturn
 
 import gi
-gi.require_version('Gtk', '3.0')
+
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-__all__ = ('gi', 'Gtk', 'TrayIcon')
+__all__ = ("gi", "Gtk", "TrayIcon")
 
 # Prefer AyatanaAppIndicator because it's under active development
 # This is opposed to AppIndicator which is abandonware
 # Fallback on old AppIndicator for Qubes R4.0 dom0 which uses Fedora 25
 try:
-    gi.require_version('AyatanaAppIndicator3', '0.1')
+    gi.require_version("AyatanaAppIndicator3", "0.1")
     from gi.repository import AyatanaAppIndicator3 as AppIndicator
 except (ImportError, ValueError):
-    gi.require_version('AppIndicator3', '0.1')
+    gi.require_version("AppIndicator3", "0.1")
     from gi.repository import AppIndicator3 as AppIndicator
 
 # pylint: disable=too-few-public-methods
@@ -38,9 +39,10 @@ class TrayIcon:
         """Create tray icon"""
         self.icon_name = icon_name
         self.indicator = AppIndicator.Indicator.new(
-            app, self.icon_name,
-            AppIndicator.IndicatorCategory.
-            APPLICATION_STATUS)
+            app,
+            self.icon_name,
+            AppIndicator.IndicatorCategory.APPLICATION_STATUS,
+        )
         self.indicator.set_status(AppIndicator.IndicatorStatus.ACTIVE)
         self.indicator.set_menu(self.menu(msg, app))
 
@@ -64,7 +66,7 @@ class TrayIcon:
 
         header = Gtk.MenuItem.new_with_label(app)
         label = Gtk.MenuItem.get_child(header)
-        label.set_markup('<b>' + label.get_text() + '</b>')
+        label.set_markup("<b>" + label.get_text() + "</b>")
         menu.append(header)
 
         entry = Gtk.MenuItem.new_with_label(msg)
@@ -75,9 +77,10 @@ class TrayIcon:
             # We do not care about cleaning up properly here; the OS will do
             # that for us.  We *do* care about exiting ASAP.
             _exit(0)
-        entry = Gtk.MenuItem.new_with_label('Stop video transmission')
-        entry.connect('activate', die)
-        menu.connect('destroy', die)
+
+        entry = Gtk.MenuItem.new_with_label("Stop video transmission")
+        entry.connect("activate", die)
+        menu.connect("destroy", die)
         menu.append(entry)
 
         menu.show_all()
