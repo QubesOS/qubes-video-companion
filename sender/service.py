@@ -19,7 +19,7 @@ import gi
 gi.require_version("Gtk", "3.0")
 gi.require_version("Gst", "1.0")
 gi.require_version("Notify", "0.7")
-from gi.repository import Gtk, Gst, Notify
+from gi.repository import Gtk, Gst, Notify  # pylint: disable=no-name-in-module
 
 import tray_icon
 
@@ -137,7 +137,7 @@ class Service:
         """Program entry point"""
 
         import argparse
-        import qubesdb
+        import qubesdb  # pylint: disable=import-error
 
         argparse.ArgumentParser().parse_args()
 
