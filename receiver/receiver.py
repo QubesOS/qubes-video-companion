@@ -15,7 +15,8 @@ def main(argv) -> NoReturn:
 
     width, height, fps = read_video_parameters()
 
-    print('Receiving video stream at {}x{} {} FPS...'.format(width, height, fps),
+    print('Receiving video stream at {}x{} {} FPS...'
+          .format(width, height, fps),
           file=sys.stderr)
     os.execv('/usr/bin/gst-launch-1.0', (
         'gst-launch-1.0',
@@ -47,17 +48,19 @@ def main(argv) -> NoReturn:
 def read_video_parameters() -> (int, int, int):
     input_size = 6
 
-    s = struct.Struct('=HHH')
-    if s.size != input_size:
+    sstruct = struct.Struct('=HHH')
+    if sstruct.size != input_size:
         raise AssertionError('bug')
 
     untrusted_input = os.read(0, input_size)
     if len(untrusted_input) != input_size:
         raise RuntimeError('wrong number of bytes read')
-    untrusted_width, untrusted_height, untrusted_fps = s.unpack(untrusted_input)
+    untrusted_width, untrusted_height, untrusted_fps = \
+        sstruct.unpack(untrusted_input)
     del untrusted_input
 
-    if untrusted_width > 4096 or untrusted_height > 4096 or untrusted_fps > 4096:
+    if untrusted_width > 4096 or untrusted_height > 4096 \
+            or untrusted_fps > 4096:
         raise RuntimeError('excessive width, height, and/or fps')
     width, height, fps = untrusted_width, untrusted_height, untrusted_fps
     del untrusted_width, untrusted_height, untrusted_fps

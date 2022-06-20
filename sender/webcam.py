@@ -24,14 +24,17 @@ class Webcam(Service):
         return 'camera-web'
 
     def parameters(self):
-        mjpeg_re = re.compile(rb"\t\[[0-9]+]: 'MJPG' \(Motion-JPEG, compressed\)\Z")
+        mjpeg_re = re.compile(
+            rb"\t\[[0-9]+]: 'MJPG' \(Motion-JPEG, compressed\)\Z")
         fmt_re = re.compile(rb"\t\[[0-9]+]: ")
         dimensions_re = re.compile(rb"\t\tSize: Discrete [0-9]+x[0-9]+\Z")
-        interval_re = re.compile(rb"\t\t\tInterval: Discrete [0-9.]+s \([0-9]+\.0+ fps\)\Z")
+        interval_re = re.compile(
+            rb"\t\t\tInterval: Discrete [0-9.]+s \([0-9]+\.0+ fps\)\Z")
         proc = subprocess.run(('v4l2-ctl', '--list-formats-ext'),
                               stdout=subprocess.PIPE,
                               check=True,
                               env={'PATH': '/bin:/usr/bin', 'LC_ALL': 'C'})
+        # pylint: disable=unused-variable
         emit = False
         formats = []
         for i in proc.stdout.split(b'\n'):
@@ -44,7 +47,8 @@ class Webcam(Service):
             elif interval_re.match(i):
                 fps = int(i[22:].split(b'(', 1)[1].split(b'.', 1)[0])
                 formats.append((width, height, fps))
-            elif i in (b'', b'ioctl: VIDIOC_ENUM_FMT', b'\tType: Video Capture'):
+            elif i in \
+                    (b'', b'ioctl: VIDIOC_ENUM_FMT', b'\tType: Video Capture'):
                 continue
             else:
                 print('Cannot parse output %r of v4l2ctl' % i, file=sys.stderr)
@@ -66,7 +70,8 @@ class Webcam(Service):
             'queue',
             '!',
             'capsfilter',
-            'caps=image/jpeg,colorimetry=(string)2:4:7:1,chroma-site=none,' + caps,
+            'caps=image/jpeg,colorimetry=(string)2:4:7:1,chroma-site=none,'
+            + caps,
             '!',
             'jpegdec',
             '!',

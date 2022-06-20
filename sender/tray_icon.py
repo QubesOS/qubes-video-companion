@@ -30,15 +30,17 @@ except (ImportError, ValueError):
     gi.require_version('AppIndicator3', '0.1')
     from gi.repository import AppIndicator3 as AppIndicator
 
-class TrayIcon(object):
+# pylint: disable=too-few-public-methods
+class TrayIcon:
     """Tray icon user interface component"""
 
     def __init__(self, app, icon_name, msg):
         """Create tray icon"""
         self.icon_name = icon_name
-        self.indicator = AppIndicator.Indicator.new(app, self.icon_name,
-                                                    AppIndicator.IndicatorCategory.
-                                                    APPLICATION_STATUS)
+        self.indicator = AppIndicator.Indicator.new(
+            app, self.icon_name,
+            AppIndicator.IndicatorCategory.
+            APPLICATION_STATUS)
         self.indicator.set_status(AppIndicator.IndicatorStatus.ACTIVE)
         self.indicator.set_menu(self.menu(msg, app))
 
@@ -48,7 +50,8 @@ class TrayIcon(object):
 
         # pylint: disable=line-too-long
         # FIXME: The following warning appears: Gdk-CRITICAL **: gdk_window_thaw_toplevel_updates: assertion 'window->update_and_descendants_freeze_count > 0' failed
-        # This seems to be an issue in AppIndicator that others are also experiencing
+        # This seems to be an issue in AppIndicator that others
+        # are also experiencing
 
         # The fix seems to be here but implementing that locally would probably
         # be difficult without overriding AppIndicator methods to patch it:
@@ -67,6 +70,7 @@ class TrayIcon(object):
         entry = Gtk.MenuItem.new_with_label(msg)
         menu.append(entry)
 
+        # pylint: disable=unused-argument
         def die(unused_gtk) -> NoReturn:
             # We do not care about cleaning up properly here; the OS will do
             # that for us.  We *do* care about exiting ASAP.

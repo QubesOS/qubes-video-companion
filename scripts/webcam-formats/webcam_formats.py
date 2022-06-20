@@ -87,7 +87,8 @@ class WebcamFormats():
 
                 # Capture portion of line with FPS
                 fps = line.split()[3]
-                # Remove decimals with all zeros and junk opening bracket captured with FPS
+                # Remove decimals with all zeros and junk opening
+                # bracket captured with FPS
                 fps = int(fps.split(".")[0].replace("(", ""))
 
                 last_key = list(self.pix_fmt)[-1]
@@ -125,12 +126,11 @@ class WebcamFormats():
         for size in sizes_sorted:
             if size[0] > best_size[0] or size[1] > best_size[1]:
                 continue
-            else:
-                self.selected_size = size
+            self.selected_size = size
 
             current_selected_fps = 0
             for fps in sizes_sorted[size]:
-                if fps > current_selected_fps and fps <= best_fps:
+                if current_selected_fps < fps <= best_fps:
                     current_selected_fps = fps
             if current_selected_fps >= 24:
                 self.selected_fps = current_selected_fps
@@ -139,7 +139,12 @@ class WebcamFormats():
     def configure_webcam_best_format(self):
         """Configure webcam device to use the best format"""
 
-        if self.selected_format == "" or self.selected_size == tuple() or self.selected_fps == 0:
+        if self.selected_format == "" or self.selected_size == tuple() \
+                or self.selected_fps == 0:
             self.find_best_format()
 
-        subprocess.run(['v4l2-ctl', '--device', self.video_device, '--set-fmt-video', 'pixelformat=' + self.selected_format + ',width=' + str(self.selected_size[0]) + ',height=' + str(self.selected_size[1])])
+        subprocess.run(['v4l2-ctl', '--device', self.video_device,
+                        '--set-fmt-video', 'pixelformat=' +
+                        self.selected_format +
+                        ',width=' + str(self.selected_size[0]) + ',height=' +
+                        str(self.selected_size[1])], check=True)

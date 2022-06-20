@@ -9,12 +9,13 @@
 # GI requires version declaration before importing
 # pylint: disable=wrong-import-position
 
-import sys
-import struct
 import os
+import struct
+import sys
 from typing import Optional, NoReturn
 
 import gi
+
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gst', '1.0')
 gi.require_version('Notify', '0.7')
@@ -22,7 +23,7 @@ from gi.repository import Gtk, Gst, Notify
 
 import tray_icon
 
-class Service(object):
+class Service:
     """Qubes Video Companion service base class"""
 
     _quitting = None # type: bool
@@ -36,7 +37,8 @@ class Service(object):
         self._element = None
         icon = self.icon()
         # use a Unicode arrow for better UX
-        msg = self.video_source() + ': ' + target_domain + ' \u21d2 ' + remote_domain
+        msg = self.video_source() + ': ' + target_domain + ' \u21d2 ' \
+              + remote_domain
 
         app = "Qubes Video Companion"
         Notify.init(app)
@@ -91,7 +93,8 @@ class Service(object):
             self._element.set_state(Gst.State.PAUSED)
             self._element.set_state(Gst.State.PLAYING)
 
-    def validate_qube_names(self, target_domain: str, remote_domain: str) -> NoReturn:
+    @staticmethod
+    def validate_qube_names(target_domain: str, remote_domain: str) -> NoReturn:
         import re
 
         qube_re = re.compile('^[A-Za-z][A-Za-z0-9_-]{1,30}$')
@@ -111,7 +114,8 @@ class Service(object):
         sys.stdout.buffer.write(struct.pack('=HHH', width, height, fps))
         sys.stdout.buffer.flush()
         Gst.init()
-        element = self._element = Gst.parse_launchv(self.pipeline(width, height, fps))
+        element = self._element = Gst.parse_launchv(
+            self.pipeline(width, height, fps))
         bus = element.get_bus()
         bus.add_signal_watch()
         bus.connect('message', self.msg_handler)
@@ -121,7 +125,8 @@ class Service(object):
     def main(cls, self) -> NoReturn:
         """Program entry point"""
 
-        import argparse, qubesdb, os
+        import argparse
+        import qubesdb
         argparse.ArgumentParser().parse_args()
 
         target_domain = qubesdb.QubesDB().read('/name')
