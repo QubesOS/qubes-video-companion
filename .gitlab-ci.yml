@@ -9,8 +9,10 @@ checks:pylint:
   stage: checks
   tags:
     - docker
+  before_script:
+    - sudo dnf install -y python3-gobject gtk3
   script:
-    - find ./ -type f -name '*.py' | xargs pylint-3 --exit-zero
+    - pylint-3 $(find ./ -type f -name '*.py')
 
 include:
 - file: /r4.1/gitlab-base.yml
