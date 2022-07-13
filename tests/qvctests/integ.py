@@ -1,3 +1,4 @@
+import unittest
 from math import sqrt
 
 import qubes.tests.extra
@@ -82,6 +83,43 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
         self.click_stop(self.screenshare, 'screenshare')
         # wait for device to disappear, or a timeout
         self.wait_for_video0_disconnect(self.view)
+        self.assertEqual(p.wait(), 0)
+
+    # qvc.Webcam is not happy about "camera" created by qvc.ScreenShare
+    @unittest.expectedFailure
+    def test_020_webcam(self):
+        """Two stages test: screen share and then webcam
+
+        screenshare -> proxy (screenshare), then proxy -> view (webcam)
+        """
+        self.proxy.start()
+        self.view.start()
+        self.qrexec_policy('qvc.ScreenShare',
+                           self.proxy.name,
+                           '@default',
+                           target=self.screenshare.name)
+        self.qrexec_policy('qvc.Webcam',
+                           self.view.name,
+                           '@default',
+                           target=self.proxy.name)
+        p = self.proxy.run('qubes-video-companion screenshare',
+                           passio_popen=True)
+        # wait for device to appear, or a timeout
+        self.wait_for_video0(self.proxy)
+        self.assertIsNone(p.returncode)
+        p2 = self.view.run('qubes-video-companion webcam',
+                           passio_popen=True)
+        self.wait_for_video0(self.view)
+        self.assertIsNone(p2.returncode)
+
+        source_image = self.capture_from_screen(self.screenshare)
+        destination_image = self.capture_from_video(self.view)
+        diff = self.compare_images(source_image, destination_image)
+        self.assertLess(diff, 2.0)
+        self.click_stop(self.view, 'webcam')
+        self.click_stop(self.screenshare, 'screenshare')
+        self.wait_for_video0_disconnect(self.proxy)
+        self.assertEqual(p2.wait(), 0)
         self.assertEqual(p.wait(), 0)
 
 
