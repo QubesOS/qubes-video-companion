@@ -7,6 +7,7 @@ BINDIR ?= /usr/bin
 DATADIR ?= /usr/share
 SYSCONFDIR ?= /etc
 QREXECDIR ?= $(SYSCONFDIR)/qubes-rpc
+PYTHON ?= python3
 
 INSTALL_DIR = install -d --
 INSTALL_PROGRAM = install -D --
@@ -18,6 +19,7 @@ help:
 	@echo "make install-dom0	Install all components necessary for dom0"
 	@echo "make install-both	Install components necessary for VMs and dom0"
 	@echo "make install-policy	Install qrexec policies"
+	@echo "make install-tests	Install integration tests"
 	@echo "make install-license	Install license to $(DATADIR)/licenses/$(PKGNAME)"
 	@echo "make clean		Clean build"
 
@@ -41,7 +43,7 @@ install-vm: install-both
 	$(INSTALL_DIR) $(DESTDIR)$(DATADIR)/$(PKGNAME)/scripts/v4l2loopback
 	$(MAKE) -C doc install
 
-install-dom0: install-both install-policy
+install-dom0: install-both install-policy install-tests
 
 install-both:
 	$(INSTALL_DIR) $(DESTDIR)$(QREXECDIR)
@@ -56,6 +58,9 @@ install-both:
 install-policy:
 	$(INSTALL_DIR) $(DESTDIR)$(QREXECDIR)/policy
 	$(INSTALL_DATA) qubes-rpc/policies/* $(DESTDIR)$(QREXECDIR)/policy
+
+install-tests:
+	cd tests && $(PYTHON) setup.py install -O1 --root $(DESTDIR)
 
 install-license:
 	$(INSTALL_DIR) $(DESTDIR)$(DATADIR)/licenses/$(PKGNAME)
