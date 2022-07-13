@@ -63,6 +63,8 @@ make DESTDIR=%{?buildroot} install-dom0 install-license
 %{_datadir}/qubes-video-companion/sender/webcam.py
 %{_datadir}/qubes-video-companion/sender/screenshare.py
 %{_datadir}/qubes-video-companion/sender/tray_icon.py
+%{python3_sitelib}/qvctests
+%{python3_sitelib}/qvctests-*.egg-info
 
 %changelog
 @CHANGELOG@
