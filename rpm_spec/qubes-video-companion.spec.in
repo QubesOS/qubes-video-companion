@@ -34,6 +34,7 @@ Summary:        Video sender part of qubes-video-companion
 BuildArch:      noarch
 Requires:       gstreamer1-plugins-good
 Requires:       python3
+Requires:       v4l-utils
 Requires:       qubes-video-companion-license
 
 %description sender
