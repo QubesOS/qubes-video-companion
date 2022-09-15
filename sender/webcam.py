@@ -68,7 +68,6 @@ class Webcam(Service):
             "width={0},"
             "height={1},"
             "framerate={2}/1,"
-            "format=I420,"
             "interlace-mode=progressive,"
             "pixel-aspect-ratio=1/1,"
             "max-framerate={2}/1,"
@@ -80,7 +79,7 @@ class Webcam(Service):
             "queue",
             "!",
             "capsfilter",
-            "caps=image/jpeg,colorimetry=(string)2:4:7:1,chroma-site=none,"
+            "caps=image/jpeg,chroma-site=none,"
             + caps,
             "!",
             "jpegdec",
