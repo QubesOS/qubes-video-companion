@@ -12,7 +12,7 @@ checks:pylint:
   before_script:
     - sudo dnf install -y python3-gobject gtk3
   script:
-    - pylint-3 $(find ./ -type f -name '*.py')
+    - pylint-3 $(find sender receiver scripts -type f -name '*.py')
 
 include:
 - file: /r4.1/gitlab-base.yml
