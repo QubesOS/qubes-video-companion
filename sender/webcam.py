@@ -80,7 +80,7 @@ class Webcam(Service):
             "queue",
             "!",
             "capsfilter",
-            "caps=image/jpeg,colorimetry=(string)2:4:7:1,chroma-site=none,"
+            "caps=image/jpeg,chroma-site=none,"
             + caps,
             "!",
             "jpegdec",
