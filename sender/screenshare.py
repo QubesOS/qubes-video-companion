@@ -31,9 +31,10 @@ class ScreenShare(Service):
     def parameters(self) -> tuple[int, int, int]:
         monitor = Gdk.Display().get_default().get_monitor(0)
         scale, geometry = monitor.get_scale_factor(), monitor.get_geometry()
-        return (scale * geometry.width, scale * geometry.height, 30)
+        return (scale * geometry.width, scale * geometry.height, 30, {})
 
-    def pipeline(self, width: int, height: int, fps: int) -> list[str]:
+    def pipeline(self, width: int, height: int, fps: int,
+                 **kwargs) -> list[str]:
         caps = (
             "colorimetry=2:4:7:1,"
             "chroma-site=none,"

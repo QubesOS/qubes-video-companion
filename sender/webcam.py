@@ -39,19 +39,18 @@ class Webcam(Service):
             check=True,
             env={"PATH": "/bin:/usr/bin", "LC_ALL": "C"},
         )
-        # pylint: disable=unused-variable
-        emit = False
         formats = []
         for i in proc.stdout.split(b"\n"):
             if mjpeg_re.match(i):
-                emit = True
+                fmt = "image/jpeg"
             elif fmt_re.match(i):
-                emit = False
+                # try raw, if it doesn't match, gstreamer will tell you
+                fmt = "video/x-raw"
             elif dimensions_re.match(i):
                 width, height = map(int, i[17:].split(b"x"))
             elif interval_re.match(i):
                 fps = int(i[22:].split(b"(", 1)[1].split(b".", 1)[0])
-                formats.append((width, height, fps))
+                formats.append((width, height, fps, {"fmt": fmt}))
             elif i in (
                 b"",
                 b"ioctl: VIDIOC_ENUM_FMT",
@@ -63,30 +62,36 @@ class Webcam(Service):
         formats.sort(key=lambda x: x[0] * x[1] * x[2], reverse=True)
         return formats[0]
 
-    def pipeline(self, width: int, height: int, fps: int):
+    def pipeline(self, width: int, height: int, fps: int, **kwargs):
+        fmt = kwargs.get("fmt", "image/jpeg")
         caps = (
             "width={0},"
             "height={1},"
             "framerate={2}/1,"
-            "format=I420,"
             "interlace-mode=progressive,"
             "pixel-aspect-ratio=1/1,"
             "max-framerate={2}/1,"
             "views=1".format(width, height, fps)
         )
+        if "jpeg" in fmt:
+            convert = (
+                "!",
+                "capsfilter",
+                "caps={},chroma-site=none,".format(fmt)
+                + caps,
+                "!",
+                "jpegdec",
+            )
+        else:
+            convert = ("!", "videoconvert",)
         return [
             "v4l2src",
             "!",
             "queue",
+            *convert,
             "!",
             "capsfilter",
-            "caps=image/jpeg,chroma-site=none,"
-            + caps,
-            "!",
-            "jpegdec",
-            "!",
-            "capsfilter",
-            "caps=video/x-raw," + caps,
+            "caps=video/x-raw,format=I420," + caps,
             "!",
             "fdsink",
         ]

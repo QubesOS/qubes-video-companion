@@ -64,13 +64,14 @@ class Service:
         """
         raise NotImplementedError("Pure virtual method called!")
 
-    def pipeline(self, width: int, height: int, fps: int) -> list[str]:
+    def pipeline(self, width: int, height: int, fps: int,
+                 **kwargs) -> list[str]:
         """
         Return a set-up GStreamer pipeline
         """
         raise NotImplementedError("Pure virtual method called!")
 
-    def parameters(self) -> tuple[int, int, int]:
+    def parameters(self) -> tuple[int, int, int, dict]:
         """
         Compute the parameters.  Return a (width, height, fps) tuple.
         """
@@ -120,12 +121,12 @@ class Service:
     def start_transmission(self) -> None:
         """Start video transmission"""
 
-        width, height, fps = self.parameters()
+        width, height, fps, extra_params = self.parameters()
         sys.stdout.buffer.write(struct.pack("=HHH", width, height, fps))
         sys.stdout.buffer.flush()
         Gst.init()
         element = self._element = Gst.parse_launchv(
-            self.pipeline(width, height, fps)
+            self.pipeline(width, height, fps, **extra_params)
         )
         bus = element.get_bus()
         bus.add_signal_watch()
