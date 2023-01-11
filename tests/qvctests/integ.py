@@ -73,7 +73,9 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
                            passio_popen=True)
         # wait for device to appear, or a timeout
         self.wait_for_video0(self.view)
-        self.assertIsNone(p.returncode)
+        if p.returncode is not None:
+            self.fail("'qubes-video-companion screenshare' exited early ({}): {} {}".format(
+                        p.returncode, *p.communicate()))
 
         # capture in source:
         source_image = self.capture_from_screen(self.screenshare)
