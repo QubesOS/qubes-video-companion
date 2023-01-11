@@ -56,6 +56,5 @@ else
 fi
 
 /usr/share/qubes-video-companion/receiver/setup.sh
-# Disabling buffering should lower latency and it doesn't seem to impact performance
 # Filter standard error escape characters for safe printing to the terminal from the video sender
-qrexec-client-vm --buffer-size=0 --filter-escape-chars-stderr -- "$qube" "$qvc_service" /usr/share/qubes-video-companion/receiver/receiver.py
+qrexec-client-vm --filter-escape-chars-stderr -- "$qube" "$qvc_service" /usr/share/qubes-video-companion/receiver/receiver.py
