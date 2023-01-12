@@ -83,7 +83,17 @@ class Webcam(Service):
                 "jpegdec",
             )
         else:
-            convert = ("!", "videoconvert",)
+            convert = (
+                    "!",
+                    "videoconvert",
+                    # workaround until
+                    # https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/3713
+                    # get merged:
+                    # no-op filter that copies the frame based on its actual
+                    # size, to discard padding
+                    "!",
+                    "videoflip",
+                    )
         return [
             "v4l2src",
             "!",
