@@ -9,6 +9,7 @@ ignore=tests
 disable=
   abstract-class-little-used,
   bad-continuation,
+  consider-using-f-string,
   cyclic-import,
   deprecated-method,
   duplicate-code,
