@@ -14,6 +14,7 @@ import gi
 gi.require_version("Gdk", "3.0")
 from gi.repository import Gdk
 from service import Service
+from typing import List, Tuple
 
 
 class ScreenShare(Service):
@@ -28,13 +29,13 @@ class ScreenShare(Service):
     def icon(self) -> str:
         return "video-display"
 
-    def parameters(self) -> tuple[int, int, int]:
+    def parameters(self) -> Tuple[int, int, int]:
         monitor = Gdk.Display().get_default().get_monitor(0)
         scale, geometry = monitor.get_scale_factor(), monitor.get_geometry()
         return (scale * geometry.width, scale * geometry.height, 30, {})
 
     def pipeline(self, width: int, height: int, fps: int,
-                 **kwargs) -> list[str]:
+                 **kwargs) -> List[str]:
         caps = (
             "colorimetry=2:4:7:1,"
             "chroma-site=none,"

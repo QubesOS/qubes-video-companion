@@ -12,7 +12,7 @@
 import os
 import struct
 import sys
-from typing import Optional, NoReturn
+from typing import Optional, NoReturn, List, Tuple
 
 import gi
 
@@ -65,13 +65,13 @@ class Service:
         raise NotImplementedError("Pure virtual method called!")
 
     def pipeline(self, width: int, height: int, fps: int,
-                 **kwargs) -> list[str]:
+                 **kwargs) -> List[str]:
         """
         Return a set-up GStreamer pipeline
         """
         raise NotImplementedError("Pure virtual method called!")
 
-    def parameters(self) -> tuple[int, int, int, dict]:
+    def parameters(self) -> Tuple[int, int, int, dict]:
         """
         Compute the parameters.  Return a (width, height, fps) tuple.
         """
