@@ -22,4 +22,4 @@ sudo modprobe v4l2loopback card_label="Qubes Video Companion" exclusive_caps=1
 # For some reason, AppVMs based off my self-made "kali" qube (which itself is based off the "debian-10" TemplateVM) that are using the 5.x Qubes Linux kernel no longer has the user permitting ACL (or any ACL for that matter) on /dev/video* devices causing a permission error when attempting to write video to the device
 # As a workaround, we set the ACL ourselves in case it isn't already applied
 # This issue does not occur on the Fedora or Debian AppVMs using the 5.x Qubes Linux kernel, more research is required
-sudo setfacl -m user:user:rw /dev/video0
+sudo setfacl -m qubes:group:rw /dev/video0
