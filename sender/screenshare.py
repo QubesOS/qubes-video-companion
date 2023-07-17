@@ -31,12 +31,17 @@ class ScreenShare(Service):
 
     def parameters(self) -> Tuple[int, int, int]:
         monitor = Gdk.Display().get_default().get_monitor(0).get_geometry()
-        return (monitor.width, monitor.height, 30, {})
+        screen = Gdk.Screen().get_default()
+        kwargs = {
+            "crop_t": monitor.y,
+            "crop_l": monitor.x,
+            "crop_r": screen.width() - monitor.x - monitor.width,
+            "crop_b": screen.height() - monitor.y - monitor.height,
+        }
+        return (monitor.width, monitor.height, 30, kwargs)
 
     def pipeline(self, width: int, height: int, fps: int,
                  **kwargs) -> List[str]:
-        monitor = Gdk.Display().get_default().get_monitor(0).get_geometry()
-        screen = Gdk.Screen().get_default()
         caps = (
             "colorimetry=2:4:7:1,"
             "chroma-site=none,"
@@ -55,10 +60,10 @@ class ScreenShare(Service):
             "queue",
             "!",
             "videocrop",
-            "top=" + str(monitor.y),
-            "left=" + str(monitor.x),
-            "right=" + str(screen.width() - monitor.x - monitor.width),
-            "bottom=" + str(screen.height() - monitor.y - monitor.height),
+            "top=" + str(kwargs["crop_t"]),
+            "left=" + str(kwargs["crop_l"]),
+            "right=" + str(kwargs["crop_r"]),
+            "bottom=" + str(kwargs["crop_b"]),
             "!",
             "capsfilter",
             "caps=video/x-raw,format=BGRx," + caps,
