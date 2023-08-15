@@ -137,10 +137,7 @@ class Service:
     def main(cls, self) -> NoReturn:
         """Program entry point"""
 
-        import argparse
         import qubesdb  # pylint: disable=import-error
-
-        argparse.ArgumentParser().parse_args()
 
         target_domain = qubesdb.QubesDB().read("/name")
         if target_domain is None:
