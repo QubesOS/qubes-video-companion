@@ -25,7 +25,7 @@ class WebcamFormats:
     pix_fmt = {}
 
     selected_format = ""
-    selected_size = tuple()
+    selected_size = ()
     selected_fps = 0
 
     def __init__(self, formats, video_device="/dev/video0"):
