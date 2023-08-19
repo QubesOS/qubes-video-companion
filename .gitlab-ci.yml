@@ -10,7 +10,7 @@ checks:pylint:
   tags:
     - docker
   before_script:
-    - sudo dnf install -y python3-gobject gtk3
+    - sudo dnf install -y python3-gobject gtk3 python3-pylint
   script:
     - pylint-3 $(find sender receiver scripts -type f -name '*.py')
 
