@@ -22,7 +22,7 @@ class WebcamFormats:
 
     __line_idx = 0
 
-    pix_fmt = dict()
+    pix_fmt = {}
 
     selected_format = ""
     selected_size = tuple()
@@ -54,7 +54,7 @@ class WebcamFormats:
             if line.startswith("Pixel Format"):
                 # Remove removing surrounding single quotes (') junk
                 pix_fmt = line.split()[2].replace("'", "")
-                self.pix_fmt[pix_fmt] = dict()
+                self.pix_fmt[pix_fmt] = {}
 
             if line.startswith("Size"):
                 self.__size()
@@ -69,7 +69,7 @@ class WebcamFormats:
         size = tuple(map(int, size.split("x")))
 
         last_key = list(self.pix_fmt)[-1]
-        self.pix_fmt[last_key][size] = list()
+        self.pix_fmt[last_key][size] = []
 
         self.__line_idx += 1
         self.__fps()
