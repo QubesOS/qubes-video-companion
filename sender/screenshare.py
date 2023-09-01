@@ -31,12 +31,11 @@ class ScreenShare(Service):
 
     def parameters(self) -> Tuple[int, int, int]:
         monitor = Gdk.Display().get_default().get_monitor(0).get_geometry()
-        screen = Gdk.Screen().get_default()
         kwargs = {
-            "crop_t": monitor.y,
-            "crop_l": monitor.x,
-            "crop_r": screen.width() - monitor.x - monitor.width,
-            "crop_b": screen.height() - monitor.y - monitor.height,
+            "crop_top": monitor.y,
+            "crop_left": monitor.x,
+            "crop_right": monitor.x + monitor.width,
+            "crop_bottom": monitor.y + monitor.height,
         }
         return (monitor.width, monitor.height, 30, kwargs)
 
@@ -56,14 +55,12 @@ class ScreenShare(Service):
         return [
             "ximagesrc",
             "use-damage=false",
+            "startx=" + str(kwargs["crop_left"]),
+            "starty=" + str(kwargs["crop_top"]),
+            "endx=" + str(kwargs["crop_right"]),
+            "endy=" + str(kwargs["crop_bottom"]),
             "!",
             "queue",
-            "!",
-            "videocrop",
-            "top=" + str(kwargs["crop_t"]),
-            "left=" + str(kwargs["crop_l"]),
-            "right=" + str(kwargs["crop_r"]),
-            "bottom=" + str(kwargs["crop_b"]),
             "!",
             "capsfilter",
             "caps=video/x-raw,format=BGRx," + caps,
