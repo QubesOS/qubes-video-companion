@@ -1,3 +1,17 @@
+qubes-video-companion (1.0.4-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * ci: install pylint too
+  * Update pylint config
+  * Fix issues found by pylint
+
+  [ Demi Marie Obenour ]
+  * Avoid hardcoding user "user"
+  * Add missing 'acl' dependency
+  * Use literals instead of function calls
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 09 Oct 2023 11:10:14 +0200
+
 qubes-video-companion (1.0.3-1) unstable; urgency=medium
 
   [ WillyJL ]
