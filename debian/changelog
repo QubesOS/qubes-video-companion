@@ -1,3 +1,13 @@
+qubes-video-companion (1.0.5-1) unstable; urgency=medium
+
+  [ Tim ]
+  * fix setfacl command
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm: produce base qubes-video-companion package
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 24 Oct 2023 21:56:05 +0200
+
 qubes-video-companion (1.0.4-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
