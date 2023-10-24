@@ -19,6 +19,8 @@ Requires:       qubes-video-companion-receiver
 Requires:       qubes-video-companion-license
 Recommends:     qubes-video-companion-docs
 
+%files
+
 %package license
 Summary:        License of qubes-video-companion
 BuildArch:      noarch
