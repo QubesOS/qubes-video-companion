@@ -49,9 +49,17 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
             gst_command, passio_popen=True).communicate()[0]
 
     def capture_from_screen(self, vm):
+        gst_command = (
+            'gst-launch-1.0 --quiet ximagesrc num-buffers=1 '
+            '! capsfilter caps=video/x-raw,format=BGRx,colorimetry=2:4:7:1 '
+            '! videoconvert '
+            '! video/x-raw,format=I420 '
+            '! videoconvert '
+            '! video/x-raw,format=RGB '
+            '! fdsink'
+        )
         return vm.run(
-            'import -window root -depth 8 rgb:-', passio_popen=True)\
-            .communicate()[0]
+            gst_command, passio_popen=True).communicate()[0]
 
     def compare_images(self, img1, img2):
         """Compare images (array of RGB pixels), return similarity factor -
