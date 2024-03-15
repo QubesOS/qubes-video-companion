@@ -17,7 +17,7 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
     def wait_for_video0(self, vm):
         vm.run(
             'for i in `seq 30`; do '
-            '  [ -e /dev/video0 ] && break; '
+            '  v4l2-ctl --list-formats /dev/video0 2>/dev/null | grep -F "[0]" && break; '
             '  sleep 0.5; '
             'done; sleep 1', wait=True)
 
