@@ -65,7 +65,7 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
         """Compare images (array of RGB pixels), return similarity factor -
         the lower the better"""
 
-        assert len(img1) == len(img2)
+        self.assertEqual(len(img1), len(img2))
         sum2 = 0
         for p1, p2 in zip(img1, img2):
             sum2 += (p1-p2)**2
