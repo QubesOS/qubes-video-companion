@@ -4,18 +4,39 @@
 # Licensed under the MIT License. See LICENSE file for details.
 
 [ "$DEBUG" == 1 ] && set -x
+set -u -e
 
 set -E # Enable function inheritance of traps
 trap exit ERR
+unset GETOPT_COMPATIBLE
+name=${0##*/}
 
 usage() {
-    echo "Usage: qubes-video-companion webcam|screenshare [destination qube]"
-} >&2
+    printf '%s: Usage: qubes-video-companion [--resolution=WIDTHxHEIGHTxFPS] [--] webcam|screenshare [destination qube]\n' "$name"
+    exit "$1"
+}
 
-if [ "$#" -gt 2 ] && [ "$#" -lt 1 ]; then
-    usage
-    exit 1
-fi
+resolution=
+opts=$(getopt "--name=$name" --longoptions=resolution:,help -- r: "$@") || exit
+eval "set -- $opts"
+while :; do
+    case $1 in
+        -r|--resolution)
+            if [[ -z "$2" ]]; then
+                printf '%s: Empty resolution argument\n' "$name"
+                usage 0
+            fi >&2
+            resolution=${2//@/+}
+            resolution=${resolution//x/+}
+            shift 2
+            ;;
+        --help) usage 0;;
+        --) shift; break;;
+        *) exit 1;; # cannot happen
+    esac
+done
+
+if [ "$#" -gt 2 ] || [ "$#" -lt 1 ]; then usage 1 >&2; fi
 
 video_source="$1" qube=${2-'@default'}
 
@@ -27,18 +48,17 @@ case "$video_source" in
         qvc_service="qvc.ScreenShare"
         ;;
     *)
-        usage
-        exit 1
+        usage 1
         ;;
 esac
 
-exit_clean() {
+exit_clean () {
     exit_code="$?"
 
     /usr/share/qubes-video-companion/receiver/destroy.sh
     sudo rm -f "$qvc_lock_file"
 
-    if [ "$video_source" == "webcam" ] && [ "$exit_code" == "141" ]; then
+    if [ "$video_source" = "webcam" ] && [ "$exit_code" = "141" ]; then
         echo "The webcam device is in use! Please stop any instance of Qubes Video Companion running on another qube." >&2
         exit 1
     fi
@@ -57,4 +77,4 @@ fi
 
 /usr/share/qubes-video-companion/receiver/setup.sh
 # Filter standard error escape characters for safe printing to the terminal from the video sender
-qrexec-client-vm --filter-escape-chars-stderr -- "$qube" "$qvc_service" /usr/share/qubes-video-companion/receiver/receiver.py
+qrexec-client-vm --filter-escape-chars-stderr -- "$qube" "$qvc_service+$resolution" /usr/share/qubes-video-companion/receiver/receiver.py
