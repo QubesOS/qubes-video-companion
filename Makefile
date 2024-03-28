@@ -40,6 +40,7 @@ install-vm: install-both
 	echo 'wait-for-session=1' > $(DESTDIR)$(SYSCONFDIR)/qubes/rpc-config/qvc.ScreenShare
 	$(INSTALL_DIR) $(DESTDIR)$(DATADIR)/$(PKGNAME)/scripts
 	$(INSTALL_DATA) scripts/webcam.html $(DESTDIR)$(DATADIR)/$(PKGNAME)/scripts
+	$(INSTALL_DATA) scripts/dkms-skip.conf $(DESTDIR)$(SYSCONFDIR)/dkms/v4l2loopback.conf
 	$(INSTALL_DIR) $(DESTDIR)$(DATADIR)/$(PKGNAME)/scripts/v4l2loopback
 	$(MAKE) -C doc install
 
