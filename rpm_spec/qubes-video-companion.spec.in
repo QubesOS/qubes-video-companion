@@ -95,6 +95,7 @@ resolutions at 30 or more frames per second.
 This package contains the video-receiving portion of Qubes Video Companion.
 
 %files receiver
+%{_sysconfdir}/dkms/v4l2loopback.conf
 %{_mandir}/man1/qubes-video-companion.1.gz
 %{_bindir}/qubes-video-companion
 %{_datadir}/qubes-video-companion/receiver/setup.sh

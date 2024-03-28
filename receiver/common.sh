@@ -10,6 +10,6 @@ trap exit ERR
 
 # Test if v4l2loopback kernel module is installed
 test_v4l2loopback() {
-    # Prepend sbin directories to PATH because some distributions don't include it in the user profile by default
-    PATH="/usr/local/sbin:/usr/sbin:/sbin:$PATH" modinfo v4l2loopback &> /dev/null
+    # call modinfo via sudo because Whonix sets 0700 on /lib/modules
+    sudo --non-interactive modinfo v4l2loopback &> /dev/null
 }

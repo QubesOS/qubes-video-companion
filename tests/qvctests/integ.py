@@ -17,7 +17,7 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
     def wait_for_video0(self, vm):
         vm.run(
             'for i in `seq 30`; do '
-            '  [ -e /dev/video0 ] && break; '
+            '  v4l2-ctl --list-formats /dev/video0 2>/dev/null | grep -F "[0]" && break; '
             '  sleep 0.5; '
             'done; sleep 1', wait=True)
 
@@ -49,15 +49,23 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
             gst_command, passio_popen=True).communicate()[0]
 
     def capture_from_screen(self, vm):
+        gst_command = (
+            'gst-launch-1.0 --quiet ximagesrc num-buffers=1 '
+            '! capsfilter caps=video/x-raw,format=BGRx,colorimetry=2:4:7:1 '
+            '! videoconvert '
+            '! video/x-raw,format=I420 '
+            '! videoconvert '
+            '! video/x-raw,format=RGB '
+            '! fdsink'
+        )
         return vm.run(
-            'import -window root -depth 8 rgb:-', passio_popen=True)\
-            .communicate()[0]
+            gst_command, passio_popen=True).communicate()[0]
 
     def compare_images(self, img1, img2):
         """Compare images (array of RGB pixels), return similarity factor -
         the lower the better"""
 
-        assert len(img1) == len(img2)
+        self.assertEqual(len(img1), len(img2))
         sum2 = 0
         for p1, p2 in zip(img1, img2):
             sum2 += (p1-p2)**2
@@ -71,7 +79,7 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
                            '@default',
                            target=self.screenshare.name)
         p = self.view.run('qubes-video-companion screenshare',
-                           passio_popen=True)
+                           passio_popen=True, passio_stderr=True)
         # wait for device to appear, or a timeout
         self.wait_for_video0(self.view)
         self.loop.run_until_complete(self.wait_for_session(self.view))
@@ -87,7 +95,14 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
         self.click_stop(self.screenshare, 'screenshare')
         # wait for device to disappear, or a timeout
         self.wait_for_video0_disconnect(self.view)
-        self.assertEqual(p.wait(), 0)
+        stdout, stderr = p.communicate()
+        if p.returncode != 0:
+            self.fail("'qubes-video-companion screenshare' failed ({}): {} {}".format(
+                        p.returncode, stdout, stderr))
+        else:
+            # just print
+            print(stdout)
+            print(stderr)
 
     def test_020_webcam(self):
         """Two stages test: screen share and then webcam
@@ -107,15 +122,19 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
                            '@default',
                            target=self.proxy.name)
         p = self.proxy.run('qubes-video-companion screenshare',
-                           passio_popen=True)
+                           passio_popen=True, passio_stderr=True)
         # wait for device to appear, or a timeout
         self.wait_for_video0(self.proxy)
         self.loop.run_until_complete(asyncio.sleep(3))
-        self.assertIsNone(p.returncode)
+        if p.returncode is not None:
+            self.fail("'qubes-video-companion screenshare' exited early ({}): {} {}".format(
+                        p.returncode, *p.communicate()))
         p2 = self.view.run('qubes-video-companion webcam',
-                           passio_popen=True)
+                           passio_popen=True, passio_stderr=True)
         self.wait_for_video0(self.view)
-        self.assertIsNone(p2.returncode)
+        if p2.returncode is not None:
+            self.fail("'qubes-video-companion webcam' exited early ({}): {} {}".format(
+                        p2.returncode, *p2.communicate()))
 
         source_image = self.capture_from_screen(self.screenshare)
         destination_image = self.capture_from_video(self.view)
@@ -124,8 +143,22 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
         self.click_stop(self.proxy, 'webcam')
         self.click_stop(self.screenshare, 'screenshare')
         self.wait_for_video0_disconnect(self.proxy)
-        self.assertEqual(p2.wait(), 0)
-        self.assertEqual(p.wait(), 0)
+        stdout, stderr = p2.communicate()
+        if p2.returncode != 0:
+            self.fail("'qubes-video-companion screenshare' failed ({}): {} {}".format(
+                        p2.returncode, stdout, stderr))
+        else:
+            # just print
+            print(stdout)
+            print(stderr)
+        stdout, stderr = p.communicate()
+        if p.returncode != 0:
+            self.fail("'qubes-video-companion screenshare' failed ({}): {} {}".format(
+                        p.returncode, stdout, stderr))
+        else:
+            # just print
+            print(stdout)
+            print(stderr)
 
 
 def list_tests():

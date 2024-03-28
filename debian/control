@@ -10,6 +10,8 @@ Package: qubes-video-companion
 Architecture: all
 Multi-Arch: foreign
 Depends: gir1.2-ayatanaappindicator3-0.1,
+         gir1.2-gstreamer-1.0,
+         gir1.2-notify-0.7,
          gstreamer1.0-plugins-good,
          gstreamer1.0-tools,
          python3,
