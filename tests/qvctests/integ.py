@@ -129,6 +129,10 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
         if p.returncode is not None:
             self.fail("'qubes-video-companion screenshare' exited early ({}): {} {}".format(
                         p.returncode, *p.communicate()))
+        # check if the screenshare device works
+        frame = self.capture_from_video(self.proxy)
+        self.assertTrue(frame)
+
         p2 = self.view.run('qubes-video-companion webcam',
                            passio_popen=True, passio_stderr=True)
         self.wait_for_video0(self.view)
