@@ -15,8 +15,43 @@ from service import Service
 class Webcam(Service):
     """Webcam video source class"""
 
-    def __init__(self):
-        self.main(self)
+    untrusted_requested_width: int
+    untrusted_requested_height: int
+    untrusted_requested_fps: int
+
+    def __init__(self, *, untrusted_arg: str):
+        if untrusted_arg:
+            untrusted_arg_bytes = untrusted_arg.encode('ascii', 'strict')
+            def parse_int(untrusted_decimal: bytes) -> int:
+                if not ((1 <= len(untrusted_decimal) <= 4) and
+                        untrusted_decimal.isdigit() and
+                        untrusted_decimal[0] != b"0"):
+                    print("Invalid argument " + untrusted_arg + ": bad number",
+                          file=sys.stderr)
+                    sys.exit(1)
+                return int(untrusted_decimal, 10)
+            if len(untrusted_arg_bytes) > 14:
+                # qrexec has already sanitized the argument to some degree,
+                # so this is safe
+                print("Invalid argument " + untrusted_arg +
+                      ": too long (limit 14 bytes)", file=sys.stderr)
+                sys.exit(1)
+            arg_list = untrusted_arg_bytes.split(b"+", 4)
+            if len(arg_list) != 3:
+                print("Invalid argument " + untrusted_arg +
+                      ": wrong number of integers (expected 3)",
+                      file=sys.stderr)
+                sys.exit(1)
+            ( self.untrusted_requested_width
+            , self.untrusted_requested_height
+            , self.untrusted_requested_fps
+            ) = map(parse_int, arg_list)
+        else:
+            self.untrusted_requested_width = 0
+            self.untrusted_requested_height = 0
+            self.untrusted_requested_fps = 0
+
+        Service.main(self)
 
     def video_source(self) -> str:
         return "webcam"
@@ -60,6 +95,11 @@ class Webcam(Service):
             else:
                 print("Cannot parse output %r of v4l2ctl" % i, file=sys.stderr)
         formats.sort(key=lambda x: x[0] * x[1] * x[2], reverse=True)
+        if self.untrusted_requested_fps:
+            formats.sort(key=lambda x:
+                         (x[0] - self.untrusted_requested_width) ** 2 +
+                         (x[1] - self.untrusted_requested_height) ** 2 +
+                         (x[2] - self.untrusted_requested_fps) ** 2)
         return formats[0]
 
     def pipeline(self, width: int, height: int, fps: int, **kwargs):
@@ -108,4 +148,11 @@ class Webcam(Service):
 
 
 if __name__ == "__main__":
-    webcam = Webcam()
+    _untrusted_arg = ""
+    if len(sys.argv) == 2:
+        _untrusted_arg = sys.argv[1]
+    elif len(sys.argv) != 1:
+        print("Must have 0 or 1 argument, not " + str(len(sys.argv)),
+              file=sys.stderr)
+        sys.exit(1)
+    webcam = Webcam(untrusted_arg=_untrusted_arg)
