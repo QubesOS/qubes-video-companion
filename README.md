@@ -37,7 +37,7 @@ The project emphasizes correctness and security all the while also sporting supe
 Qubes Video Companion is available for installation on Qubes OS in packaged form for both Fedora (.rpm) and Debian (.deb). To get it, simply install the `qubes-video-companion` package as shown below!
 
 ### Run the following commands in Dom0 (AdminVM)
-`sudo qubes-dom0-update qubes-video-companion`
+`sudo qubes-dom0-update qubes-video-companion-dom0`
 
 ### Run the following commands in a TemplateVM or AppVM
 
