@@ -30,10 +30,6 @@ The project emphasizes correctness and security all the while also sporting supe
 
 ## Installation
 
-**WIP: Currently in the process of being streamlined as part of core Qubes OS**
-
-**For testers (thank you for your help!), please use the build scripts in the `build` directory of this repo to build the required Qubes Video Companion package(s). Install them in `sys-usb` and any other AppVM for receiving the video. Also, ensure that at minimum in the Qubes RPC policies in `qubes-rpc/policies` are installed into Dom0 at `/etc/qubes-rpc/policy`.**
-
 Qubes Video Companion is available for installation on Qubes OS in packaged form for both Fedora (.rpm) and Debian (.deb). To get it, simply install the `qubes-video-companion` package as shown below!
 
 ### Run the following commands in Dom0 (AdminVM)
