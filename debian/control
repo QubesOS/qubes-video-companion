@@ -18,7 +18,7 @@ Depends: gir1.2-ayatanaappindicator3-0.1,
          v4l-utils,
          acl,
          ${misc:Depends},
-Recommends:
+Suggests:
   v4l2loopback-dkms (>= 0.12.5-1),
 Description: Securely stream webcams and share screens across virtual machines
  Qubes Video Companion is a tool for securely streaming webcams and sharing

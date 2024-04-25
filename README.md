@@ -43,6 +43,9 @@ Qubes Video Companion is available for installation on Qubes OS in packaged form
 #### Debian
 `sudo apt update && sudo apt install qubes-video-companion`
 
+Additionally, when using a kernel from inside the qube, v4l2loopback-dkms package needs to be installed:
+`sudo apt install v4l2loopback-dkms`
+
 ## Usage
 
 ### Webcam
