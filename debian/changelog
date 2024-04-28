@@ -1,3 +1,17 @@
+qubes-video-companion (1.0.7-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * Allow the receiver to request a preferred resolution
+
+  [ Atrate ]
+  * Fix installation instructions
+
+  [ Marek Marczykowski-Górecki ]
+  * Remove "WIP" disclaimer
+  * Downgrade v4l2loopback-dkms dependency to "Suggests"
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 28 Apr 2024 03:14:30 +0200
+
 qubes-video-companion (1.0.6-1) unstable; urgency=medium
 
   * tests: fix waiting for streaming start
