@@ -1,0 +1,14 @@
+## Do not modify this file, create a new policy file with a lower number in the
+## filename instead. For example `30-user.policy`.
+
+###
+### Policy Qubes Video Companion policy
+###
+
+qvc.ScreenShare * @anyvm @dispvm  allow
+qvc.ScreenShare * @anyvm @adminvm ask
+qvc.ScreenShare * @anyvm @anyvm   ask
+
+qvc.Webcam * @anyvm @adminvm ask
+qvc.Webcam * @anyvm @default ask
+qvc.Webcam * @anyvm sys-usb  ask
