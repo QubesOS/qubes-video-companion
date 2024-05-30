@@ -1,7 +1,9 @@
 #!/bin/sh --
-
 # Copyright (C) 2021 Elliot Killick <elliotkillick@zohomail.eu>
 # Copyright (C) 2021 Demi Marie Obenour <demi@invisiblethingslab.com>
 # Licensed under the MIT License. See LICENSE file for details.
-export DISPLAY=:0
+set -eu
+true "${XDG_RUNTIME_DIR:="/run/user/$(id -u)"}"
+true "${DBUS_SESSION_BUS_ADDRESS:="unix:path=${XDG_RUNTIME_DIR}/bus"}"
+export DISPLAY=:0 XDG_RUNTIME_DIR DBUS_SESSION_BUS_ADDRESS
 exec python3 -- /usr/share/qubes-video-companion/sender/screenshare.py
