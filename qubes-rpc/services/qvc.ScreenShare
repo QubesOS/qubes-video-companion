@@ -1,7 +1,31 @@
 #!/bin/sh --
-
 # Copyright (C) 2021 Elliot Killick <elliotkillick@zohomail.eu>
 # Copyright (C) 2021 Demi Marie Obenour <demi@invisiblethingslab.com>
 # Licensed under the MIT License. See LICENSE file for details.
+
+set -eu
+
+## DISPLAY variable used by: xrandr, zenity
 export DISPLAY=:0
+
+true "${XDG_RUNTIME_DIR:="/run/user/$(id -u)"}"
+true "${DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"}"
+monitors="$(xrandr --listactivemonitors \
+            | awk '/^ [0-9]+: \+/ { print "FALSE", $4, $3 }')"
+monitor_count="$(echo "${monitors}" | wc -l)"
+monitor_longest_line="$(echo "${monitors}" | wc -L)"
+dialog_height="$((monitor_count*50+60))"
+dialog_width="$((monitor_longest_line*10))"
+if test "${monitor_count}" -gt 1; then
+  # shellcheck disable=SC2086
+  QVC_MONITOR="$(zenity --list --radiolist \
+    --height="${dialog_height}" --width="${dialog_width}" \
+    --column "ID" --column "Name" --column "Resolution" \
+    --title "Screen share" \
+    --text "Select monitor to present to qube ${QREXEC_REMOTE_DOMAIN}" \
+    ${monitors})"
+fi
+true "${QVC_MONITOR:=}"
+
+export XDG_RUNTIME_DIR DBUS_SESSION_BUS_ADDRESS QVC_MONITOR
 exec python3 -- /usr/share/qubes-video-companion/sender/screenshare.py

@@ -12,7 +12,8 @@ unset GETOPT_COMPATIBLE
 name=${0##*/}
 
 usage() {
-    printf '%s: Usage: qubes-video-companion [--resolution=WIDTHxHEIGHTxFPS] [--] webcam|screenshare [destination qube]\n' "$name"
+    echo "Usage: $name [--resolution=[WIDTHxHEIGHTxFPS]] [--] webcam|screenshare [destination qube]" >&2
+    echo "Resolution example: 1920x1080x60"
     exit "$1"
 }
 
@@ -23,14 +24,14 @@ while :; do
     case $1 in
         -r|--resolution)
             if [[ -z "$2" ]]; then
-                printf '%s: Empty resolution argument\n' "$name"
-                usage 0
-            fi >&2
+                echo "$name: Empty resolution argument" >&2
+                usage 1
+            fi
             resolution=${2//@/+}
             resolution=${resolution//x/+}
             shift 2
             ;;
-        --help) usage 0;;
+        -h|--help) usage 0;;
         --) shift; break;;
         *) exit 1;; # cannot happen
     esac
@@ -71,7 +72,7 @@ if ! [ -f "$qvc_lock_file" ]; then
     trap exit_clean EXIT
     sudo touch "$qvc_lock_file"
 else
-    echo "Qubes Video Companion is already running! Please stop the previous session before starting a new one." >&2
+    echo "Qubes Video Companion is already running! Please stop the previous session before starting a new one. If you think this is an error, remove the lockfile $qvc_lock_file" >&2
     exit 1
 fi
 
