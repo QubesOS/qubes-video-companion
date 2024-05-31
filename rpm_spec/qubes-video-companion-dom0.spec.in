@@ -59,8 +59,7 @@ make DESTDIR=%{?buildroot} install-dom0 install-license
 %{_docdir}/qubes-video-companion/visualizations/*
 %{_sysconfdir}/qubes-rpc/qvc.Webcam
 %{_sysconfdir}/qubes-rpc/qvc.ScreenShare
-%{_sysconfdir}/qubes-rpc/policy/qvc.Webcam
-%{_sysconfdir}/qubes-rpc/policy/qvc.ScreenShare
+%{_sysconfdir}/qubes/policy.d/90-default-video-companion.policy
 %{_datadir}/qubes-video-companion/sender/service.py
 %{_datadir}/qubes-video-companion/sender/webcam.py
 %{_datadir}/qubes-video-companion/sender/screenshare.py
