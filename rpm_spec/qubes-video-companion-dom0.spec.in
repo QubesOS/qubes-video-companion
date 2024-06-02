@@ -9,7 +9,7 @@ Release:        @REL@%{?dist}
 Summary:        Securely stream webcams and share screens across virtual machines
 
 License:        MIT
-URL:            https://github.com/elliotkillick/qubes-video-companion
+URL:            https://github.com/QubesOS/qubes-video-companion
 Source0:        %{vm_name}-%{version}.tar.gz
 
 BuildArch:      noarch
@@ -19,6 +19,14 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-devel
 
 Requires:       gstreamer1-plugins-good
+Requires:       v4l-utils
+%if 0%{?fedora} <= 37
+Requires:       libappindicator-gtk3
+%else
+Requires:       libayatana-appindicator-gtk3
+%endif
+Requires:       desktop-notification-daemon
+Requires:       libnotify
 
 %description
 Qubes Video Companion is a tool for securely streaming webcams and sharing
