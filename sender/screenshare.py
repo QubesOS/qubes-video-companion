@@ -10,6 +10,7 @@
 # pylint: disable=wrong-import-position
 
 import gi
+import os
 
 gi.require_version("Gdk", "3.0")
 from gi.repository import Gdk
@@ -30,15 +31,24 @@ class ScreenShare(Service):
         return "video-display"
 
     def parameters(self) -> Tuple[int, int, int]:
-        monitor = Gdk.Display().get_default().get_monitor(0).get_geometry()
+        display = Gdk.Display().get_default()
+        monitor_count = display.get_n_monitors()
+        monitor_wanted = os.environ["QVC_MONITOR"]
+        ## If wanted monitor is not found, use the primary monitor (0).
+        monitor_index = 0
+        for m in range(monitor_count):
+            if display.get_monitor(m).get_model() == monitor_wanted:
+                monitor_index = m
+                break
+        geometry = display.get_monitor(monitor_index).get_geometry()
         screen = Gdk.Screen().get_default()
         kwargs = {
-            "crop_t": monitor.y,
-            "crop_l": monitor.x,
-            "crop_r": screen.width() - monitor.x - monitor.width,
-            "crop_b": screen.height() - monitor.y - monitor.height,
+            "crop_t": geometry.y,
+            "crop_l": geometry.x,
+            "crop_r": screen.width()  - geometry.x - geometry.width,
+            "crop_b": screen.height() - geometry.y - geometry.height,
         }
-        return (monitor.width, monitor.height, 30, kwargs)
+        return (geometry.width, geometry.height, 30, kwargs)
 
     def pipeline(self, width: int, height: int, fps: int,
                  **kwargs) -> List[str]:
