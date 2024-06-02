@@ -6,7 +6,8 @@ PKGNAME = qubes-video-companion
 BINDIR ?= /usr/bin
 DATADIR ?= /usr/share
 SYSCONFDIR ?= /etc
-QREXECDIR ?= $(SYSCONFDIR)/qubes-rpc
+QREXECSERVICEDIR ?= $(SYSCONFDIR)/qubes-rpc
+QREXECPOLICYDIR ?= $(SYSCONFDIR)/qubes/policy.d
 PYTHON ?= python3
 
 INSTALL_DIR = install -d --
@@ -47,8 +48,8 @@ install-vm: install-both
 install-dom0: install-both install-policy install-tests
 
 install-both:
-	$(INSTALL_DIR) $(DESTDIR)$(QREXECDIR)
-	$(INSTALL_PROGRAM) qubes-rpc/services/qvc.Webcam qubes-rpc/services/qvc.ScreenShare $(DESTDIR)$(QREXECDIR)
+	$(INSTALL_DIR) $(DESTDIR)$(QREXECSERVICEDIR)
+	$(INSTALL_PROGRAM) qubes-rpc/services/qvc.Webcam qubes-rpc/services/qvc.ScreenShare $(DESTDIR)$(QREXECSERVICEDIR)
 	$(INSTALL_DIR) $(DESTDIR)$(DATADIR)/$(PKGNAME)/sender
 	$(INSTALL_PROGRAM) sender/*.py $(DESTDIR)$(DATADIR)/$(PKGNAME)/sender
 	$(INSTALL_DIR) $(DESTDIR)$(DATADIR)/doc/$(PKGNAME)
@@ -57,8 +58,8 @@ install-both:
 	$(INSTALL_DATA) doc/visualizations/* $(DESTDIR)$(DATADIR)/doc/$(PKGNAME)/visualizations
 
 install-policy:
-	$(INSTALL_DIR) $(DESTDIR)$(QREXECDIR)/policy
-	$(INSTALL_DATA) qubes-rpc/policies/* $(DESTDIR)$(QREXECDIR)/policy
+	$(INSTALL_DIR) $(DESTDIR)$(QREXECPOLICYDIR)
+	$(INSTALL_DATA) qubes-rpc/policies/* $(DESTDIR)$(QREXECPOLICYDIR)
 
 install-tests:
 	cd tests && $(PYTHON) setup.py install -O1 --root $(DESTDIR)
