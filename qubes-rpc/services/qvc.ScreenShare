@@ -9,7 +9,7 @@ set -eu
 export DISPLAY=:0
 
 true "${XDG_RUNTIME_DIR:="/run/user/$(id -u)"}"
-true "${DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"}"
+true "${DBUS_SESSION_BUS_ADDRESS:="unix:path=${XDG_RUNTIME_DIR}/bus"}"
 monitors="$(xrandr --listactivemonitors \
             | awk '/^ [0-9]+: \+/ { print "FALSE", $4, $3 }')"
 monitor_count="$(echo "${monitors}" | wc -l)"
