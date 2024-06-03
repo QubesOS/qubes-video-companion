@@ -21,7 +21,7 @@ The project emphasizes correctness and security all the while also sporting supe
 OPTIONS
 =======
 resolution
-    The video resolution to stream and receive video in. The format is [WIDTHxHEIGHTxFPS], meaning resolution is optional. If you set the environment variable "QVC_MONITOR" in the target, that monitor is going to be preferred and if not found, will fallback to the primary monitor. Example: "1920x1080x60"
+    The video resolution to stream and receive video in. The format is [WIDTHxHEIGHTxFPS], meaning resolution is optional. Example: "1920x1080x60"
 
 
 video_source

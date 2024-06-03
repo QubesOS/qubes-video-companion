@@ -59,6 +59,11 @@ def read_video_parameters() -> (int, int, int):
         raise AssertionError("bug")
 
     untrusted_input = os.read(0, input_size)
+
+    if len(untrusted_input) == 0:
+        print("Operation canceled by sender", file=sys.stderr)
+        sys.exit(1)
+
     if len(untrusted_input) != input_size:
         raise RuntimeError("wrong number of bytes read")
     untrusted_width, untrusted_height, untrusted_fps = sstruct.unpack(
