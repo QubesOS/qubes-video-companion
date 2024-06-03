@@ -1,3 +1,13 @@
+qubes-video-companion (1.1.0-1) unstable; urgency=medium
+
+  [ Ben Grande ]
+  * Export dbus address for the notification server
+  * Update policy format
+  * Add missing dependencies
+  * Allow monitor choice
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 03 Jun 2024 02:01:37 +0200
+
 qubes-video-companion (1.0.7-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
