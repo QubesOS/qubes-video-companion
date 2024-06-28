@@ -1,3 +1,10 @@
+qubes-video-companion (1.1.2-1) unstable; urgency=medium
+
+  [ Ben Grande ]
+  * Choose monitor with GTK dialog
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 28 Jun 2024 17:17:34 +0200
+
 qubes-video-companion (1.1.1-1) unstable; urgency=medium
 
   [ Ben Grande ]
