@@ -16,6 +16,7 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk, GdkPixbuf
 from service import Service
 from typing import List, Tuple
+from os import environ
 
 
 class ScreenShare(Service):
@@ -66,13 +67,15 @@ class ScreenShare(Service):
                 GdkPixbuf.InterpType.BILINEAR)
             monitor_screenshots.append(pixbuf)
 
-        window = Gtk.Window(title="Qubes Screen Share")
+        remote_domain = environ.get("QREXEC_REMOTE_DOMAIN")
+        window_title = "Qubes Screen Share - " + remote_domain
+        window = Gtk.Window(title=window_title)
         window.connect("destroy", Gtk.main_quit)
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
         window.add(vbox)
 
-        ## TODO: add 'remote_domain' to differentiate calls.
-        label = Gtk.Label(label="Select a monitor:")
+        window_text = "Select a monitor to share with qube " + remote_domain
+        label = Gtk.Label(label=window_text)
         vbox.pack_start(label, False, False, 0)
         hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
         vbox.pack_start(hbox, False, False, 0)
