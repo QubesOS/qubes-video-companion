@@ -8,8 +8,8 @@ import qubes.tests.extra
 class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
     def setUp(self):
         super(TC_00_QVCTest, self).setUp()
-        self.screenshare, self.proxy, self.view = self.create_vms(
-            ["share", "proxy", "view"])
+        self.screenshare, self.view = self.create_vms(
+            ["share", "view"])
         self.screenshare.start()
         if self.screenshare.run('which qubes-video-companion', wait=True) != 0:
             self.skipTest('qubes-video-companion not installed')
@@ -107,33 +107,28 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
             print(stderr)
 
     def test_020_webcam(self):
-        """Two stages test: screen share and then webcam
+        """Webcam test
 
-        screenshare -> proxy (screenshare), then proxy -> view (webcam)
+        screenshare -> view (webcam)
         """
-        self.proxy.start()
-        self.loop.run_until_complete(self.wait_for_session(self.proxy))
+        self.loop.run_until_complete(self.wait_for_session(self.screenshare))
         self.view.start()
         self.loop.run_until_complete(self.wait_for_session(self.view))
-        self.qrexec_policy('qvc.ScreenShare',
-                           self.proxy.name,
-                           '@default',
-                           target=self.screenshare.name)
         self.qrexec_policy('qvc.Webcam',
                            self.view.name,
                            '@default',
-                           target=self.proxy.name)
-        p = self.proxy.run('qubes-video-companion screenshare',
-                           passio_popen=True, passio_stderr=True)
+                           target=self.screenshare.name)
+        self.screenshare.run("modprobe v4l2loopback", user="root", wait=True)
+        p = self.screenshare.run(
+            "gst-launch-1.0 -q videotestsrc pattern=checkers-8"
+            " ! v4l2sink device=/dev/video0",
+            passio_popen=True, passio_stderr=True)
         # wait for device to appear, or a timeout
-        self.wait_for_video0(self.proxy)
+        self.wait_for_video0(self.screenshare)
         self.loop.run_until_complete(asyncio.sleep(3))
         if p.returncode is not None:
-            self.fail("'qubes-video-companion screenshare' exited early ({}): {} {}".format(
+            self.fail("'gst-launch-1.0 videotestsrc' exited early ({}): {} {}".format(
                         p.returncode, *p.communicate()))
-        # check if the screenshare device works
-        frame = self.capture_from_video(self.proxy)
-        self.assertTrue(frame)
 
         p2 = self.view.run('qubes-video-companion webcam',
                            passio_popen=True, passio_stderr=True)
@@ -142,16 +137,16 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
             self.fail("'qubes-video-companion webcam' exited early ({}): {} {}".format(
                         p2.returncode, *p2.communicate()))
 
-        source_image = self.capture_from_screen(self.screenshare)
+        source_image = self.capture_from_video(self.screenshare)
         destination_image = self.capture_from_video(self.view)
         diff = self.compare_images(source_image, destination_image)
         self.assertLess(diff, 2.5)
-        self.click_stop(self.proxy, 'webcam')
-        self.click_stop(self.screenshare, 'screenshare')
-        self.wait_for_video0_disconnect(self.proxy)
+        self.click_stop(self.screenshare, 'webcam')
+        self.wait_for_video0_disconnect(self.view)
+        self.screenshare.run("pkill gst-launch-1.0", wait=True)
         stdout, stderr = p2.communicate()
         if p2.returncode != 0:
-            self.fail("'qubes-video-companion screenshare' failed ({}): {} {}".format(
+            self.fail("'qubes-video-companion webcam' failed ({}): {} {}".format(
                         p2.returncode, stdout, stderr))
         else:
             # just print
@@ -159,7 +154,7 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
             print(stderr)
         stdout, stderr = p.communicate()
         if p.returncode != 0:
-            self.fail("'qubes-video-companion screenshare' failed ({}): {} {}".format(
+            self.fail("'gst-launch-1.0 videotestsrc' failed ({}): {} {}".format(
                         p.returncode, stdout, stderr))
         else:
             # just print
