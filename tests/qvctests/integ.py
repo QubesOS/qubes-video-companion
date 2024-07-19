@@ -8,10 +8,10 @@ import qubes.tests.extra
 class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
     def setUp(self):
         super(TC_00_QVCTest, self).setUp()
-        self.screenshare, self.view = self.create_vms(
-            ["share", "view"])
-        self.screenshare.start()
-        if self.screenshare.run('which qubes-video-companion', wait=True) != 0:
+        self.source, self.view = self.create_vms(
+            ["source", "view"])
+        self.source.start()
+        if self.source.run('which qubes-video-companion', wait=True) != 0:
             self.skipTest('qubes-video-companion not installed')
 
     def wait_for_video0(self, vm):
@@ -79,7 +79,7 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
         self.qrexec_policy('qvc.ScreenShare',
                            self.view.name,
                            '@default',
-                           target=self.screenshare.name)
+                           target=self.source.name)
         p = self.view.run('qubes-video-companion screenshare',
                            passio_popen=True, passio_stderr=True)
         # wait for device to appear, or a timeout
@@ -90,11 +90,11 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
                         p.returncode, *p.communicate()))
 
         # capture in source:
-        source_image = self.capture_from_screen(self.screenshare)
+        source_image = self.capture_from_screen(self.source)
         destination_image = self.capture_from_video(self.view)
         diff = self.compare_images(source_image, destination_image)
         self.assertLess(diff, 2.0)
-        self.click_stop(self.screenshare, 'screenshare')
+        self.click_stop(self.source, 'screenshare')
         # wait for device to disappear, or a timeout
         self.wait_for_video0_disconnect(self.view)
         stdout, stderr = p.communicate()
@@ -109,22 +109,22 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
     def test_020_webcam(self):
         """Webcam test
 
-        screenshare -> view (webcam)
+        source -> view (webcam)
         """
-        self.loop.run_until_complete(self.wait_for_session(self.screenshare))
+        self.loop.run_until_complete(self.wait_for_session(self.source))
         self.view.start()
         self.loop.run_until_complete(self.wait_for_session(self.view))
         self.qrexec_policy('qvc.Webcam',
                            self.view.name,
                            '@default',
-                           target=self.screenshare.name)
-        self.screenshare.run("modprobe v4l2loopback", user="root", wait=True)
-        p = self.screenshare.run(
+                           target=self.source.name)
+        self.source.run("modprobe v4l2loopback", user="root", wait=True)
+        p = self.source.run(
             "gst-launch-1.0 -q videotestsrc pattern=checkers-8"
             " ! v4l2sink device=/dev/video0",
             passio_popen=True, passio_stderr=True)
         # wait for device to appear, or a timeout
-        self.wait_for_video0(self.screenshare)
+        self.wait_for_video0(self.source)
         self.loop.run_until_complete(asyncio.sleep(3))
         if p.returncode is not None:
             self.fail("'gst-launch-1.0 videotestsrc' exited early ({}): {} {}".format(
@@ -137,13 +137,13 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
             self.fail("'qubes-video-companion webcam' exited early ({}): {} {}".format(
                         p2.returncode, *p2.communicate()))
 
-        source_image = self.capture_from_video(self.screenshare)
+        source_image = self.capture_from_video(self.source)
         destination_image = self.capture_from_video(self.view)
         diff = self.compare_images(source_image, destination_image)
         self.assertLess(diff, 2.5)
-        self.click_stop(self.screenshare, 'webcam')
+        self.click_stop(self.source, 'webcam')
         self.wait_for_video0_disconnect(self.view)
-        self.screenshare.run("pkill gst-launch-1.0", wait=True)
+        self.source.run("pkill gst-launch-1.0", wait=True)
         stdout, stderr = p2.communicate()
         if p2.returncode != 0:
             self.fail("'qubes-video-companion webcam' failed ({}): {} {}".format(
