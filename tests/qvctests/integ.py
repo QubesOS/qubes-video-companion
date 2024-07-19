@@ -15,11 +15,13 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
             self.skipTest('qubes-video-companion not installed')
 
     def wait_for_video0(self, vm):
-        vm.run(
+        retcode = vm.run(
             'for i in `seq 30`; do '
             '  v4l2-ctl --list-formats /dev/video0 2>/dev/null | grep -F "[0]" && break; '
             '  sleep 0.5; '
-            'done; sleep 1', wait=True)
+            'done; sleep 1; test -e /dev/video0', wait=True)
+        self.assertEqual(retcode, 0,
+                         f"Timeout waiting for /dev/video0 in {vm.name}")
 
     def wait_for_video0_disconnect(self, vm):
         vm.run(
