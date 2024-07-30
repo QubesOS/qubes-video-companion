@@ -39,12 +39,12 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
         # send keys in separate call, to not send them just to the icon window
         vm.run('xdotool key Up Return', wait=True)
 
-    def capture_from_video(self, vm):
+    def capture_from_video(self, vm, extra_caps=""):
         # capture in destination, use gstreamer as it is installed already:
         gst_command = (
             'gst-launch-1.0 --quiet v4l2src num-buffers=1 '
             '! videoconvert '
-            '! video/x-raw,format=RGB '
+            f'! video/x-raw,format=I420{extra_caps} '
             '! fdsink'
         )
         return vm.run(
@@ -56,8 +56,6 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
             '! capsfilter caps=video/x-raw,format=BGRx,colorimetry=2:4:7:1 '
             '! videoconvert '
             '! video/x-raw,format=I420 '
-            '! videoconvert '
-            '! video/x-raw,format=RGB '
             '! fdsink'
         )
         return vm.run(
@@ -106,6 +104,30 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
             print(stdout)
             print(stderr)
 
+    def apply_mask(self, image, width=640, height=480):
+        """Mask dynamic parts of vivid device output
+
+        There are two:
+         - timestamp at 16,16 -> 170,32
+         - counter + text movement at 16,96 -> 420,116
+
+        The image is assumed to be in I420 format. The mask is applied to
+        luminance channel only (which is the first 640*480 bytes).
+        """
+
+        image = list(image)
+
+        def fill_black(x1, y1, x2, y2):
+            for y in range(y1, y2):
+                start = y*width+x1
+                end = y*width+x2
+                image[start:end] = bytes(end-start)
+        fill_black(16, 16, 170, 32)
+        fill_black(16, 96, 420, 116)
+
+        return bytes(image)
+
+
     def test_020_webcam(self):
         """Webcam test
 
@@ -118,32 +140,21 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
                            self.view.name,
                            '@default',
                            target=self.source.name)
-        self.source.run("modprobe v4l2loopback", user="root", wait=True)
-        p = self.source.run(
-            "gst-launch-1.0 -q videotestsrc pattern=checkers-8"
-            " ! v4l2sink device=/dev/video0",
-            passio_popen=True, passio_stderr=True)
+        self.source.run("modprobe vivid", user="root", wait=True)
         # wait for device to appear, or a timeout
         self.wait_for_video0(self.source)
-        self.loop.run_until_complete(asyncio.sleep(3))
-        if p.returncode is not None:
-            self.fail("'gst-launch-1.0 videotestsrc' exited early ({}): {} {}".format(
-                        p.returncode, *p.communicate()))
 
-        p2 = self.view.run('qubes-video-companion webcam',
+        p2 = self.view.run('qubes-video-companion -r 640x480x30 webcam',
                            passio_popen=True, passio_stderr=True)
         self.wait_for_video0(self.view)
         if p2.returncode is not None:
             self.fail("'qubes-video-companion webcam' exited early ({}): {} {}".format(
                         p2.returncode, *p2.communicate()))
 
-        source_image = self.capture_from_video(self.source)
         destination_image = self.capture_from_video(self.view)
-        diff = self.compare_images(source_image, destination_image)
-        self.assertLess(diff, 2.5)
+        destination_image = self.apply_mask(destination_image)
         self.click_stop(self.source, 'webcam')
         self.wait_for_video0_disconnect(self.view)
-        self.source.run("pkill gst-launch-1.0", wait=True)
         stdout, stderr = p2.communicate()
         if p2.returncode != 0:
             self.fail("'qubes-video-companion webcam' failed ({}): {} {}".format(
@@ -152,14 +163,13 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
             # just print
             print(stdout)
             print(stderr)
-        stdout, stderr = p.communicate()
-        if p.returncode != 0:
-            self.fail("'gst-launch-1.0 videotestsrc' failed ({}): {} {}".format(
-                        p.returncode, stdout, stderr))
-        else:
-            # just print
-            print(stdout)
-            print(stderr)
+
+        # vivid supports only one client at a time, so capture source only
+        # after QVC disconnects
+        source_image = self.capture_from_video(self.source, ",width=640,height=480")
+        source_image = self.apply_mask(source_image)
+        diff = self.compare_images(source_image, destination_image)
+        self.assertLess(diff, 2.5)
 
 
 def list_tests():
