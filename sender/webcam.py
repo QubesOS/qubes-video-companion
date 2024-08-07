@@ -68,6 +68,9 @@ class Webcam(Service):
         interval_re = re.compile(
             rb"\t\t\tInterval: Discrete [0-9.]+s \([0-9]+\.0+ fps\)\Z"
         )
+        frac_interval_re = re.compile(
+            rb"\t\t\tInterval: Discrete [0-9.]+s \([0-9]+\.0*[1-9][0-9]* fps\)\Z"
+        )
         proc = subprocess.run(
             ("v4l2-ctl", "--list-formats-ext"),
             stdout=subprocess.PIPE,
@@ -86,6 +89,9 @@ class Webcam(Service):
             elif interval_re.match(i):
                 fps = int(i[22:].split(b"(", 1)[1].split(b".", 1)[0])
                 formats.append((width, height, fps, {"fmt": fmt}))
+            elif frac_interval_re.match(i):
+                # factional FPS not supported
+                continue
             elif i in (
                 b"",
                 b"ioctl: VIDIOC_ENUM_FMT",
