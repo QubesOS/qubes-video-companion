@@ -140,7 +140,9 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
                            self.view.name,
                            '@default',
                            target=self.source.name)
-        self.source.run("modprobe vivid", user="root", wait=True)
+        ret = self.source.run("modprobe vivid", user="root", wait=True)
+        if ret != 0:
+            self.skipTest("Cannot load 'vivid' module")
         # wait for device to appear, or a timeout
         self.wait_for_video0(self.source)
 
