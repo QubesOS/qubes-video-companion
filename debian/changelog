@@ -1,3 +1,14 @@
+qubes-video-companion (1.1.4-1) unstable; urgency=medium
+
+  * tests: fail earlier if /dev/video0 doesn't exists
+  * tests: restructure webcam test
+  * tests: rename "screenshare" to "source"
+  * tests: use 'vivid' module as a source for webcam test
+  * webcam: ignore fractional FPS
+  * tests: skip webcam test if vivid module can't be loaded
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 21 Oct 2024 03:47:59 +0200
+
 qubes-video-companion (1.1.3-1) unstable; urgency=medium
 
   [ Ben Grande ]
