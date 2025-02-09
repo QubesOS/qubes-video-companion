@@ -107,6 +107,8 @@ This package contains the video-receiving portion of Qubes Video Companion.
 %{_datadir}/qubes-video-companion/receiver/receiver.py
 %{_datadir}/qubes-video-companion/receiver/destroy.sh
 %{_datadir}/qubes-video-companion/receiver/common.sh
+/usr/share/applications/qubes-video-companion-webcam.desktop
+/usr/share/applications/qubes-video-companion-screenshare.desktop
 
 %package docs
 Summary:        Documentation for qubes-video-companion

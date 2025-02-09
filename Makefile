@@ -3,6 +3,7 @@
 
 PKGNAME = qubes-video-companion
 
+APPLICATIONSDIR ?= /usr/share/applications
 BINDIR ?= /usr/bin
 DATADIR ?= /usr/share
 SYSCONFDIR ?= /etc
@@ -43,6 +44,9 @@ install-vm: install-both
 	$(INSTALL_DATA) scripts/webcam.html $(DESTDIR)$(DATADIR)/$(PKGNAME)/scripts
 	$(INSTALL_DATA) scripts/dkms-skip.conf $(DESTDIR)$(SYSCONFDIR)/dkms/v4l2loopback.conf
 	$(INSTALL_DIR) $(DESTDIR)$(DATADIR)/$(PKGNAME)/scripts/v4l2loopback
+	install -d $(DESTDIR)$(APPLICATIONSDIR)
+	install -t ${DESTDIR}${APPLICATIONSDIR} -m 0644 desktop/qubes-video-companion-webcam.desktop
+	install -t ${DESTDIR}${APPLICATIONSDIR} -m 0644 desktop/qubes-video-companion-screenshare.desktop
 	$(MAKE) -C doc install
 
 install-dom0: install-both install-policy install-tests
