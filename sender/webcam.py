@@ -69,7 +69,8 @@ class Webcam(Service):
             rb"\t\t\tInterval: Discrete [0-9.]+s \([0-9]+\.0+ fps\)\Z"
         )
         frac_interval_re = re.compile(
-            rb"\t\t\tInterval: Discrete [0-9.]+s \([0-9]+\.0*[1-9][0-9]* fps\)\Z"
+            rb"\t\t\tInterval: Discrete [0-9.]+s \([0-9]+\.0*[1-9][0-9]* "\
+            rb"fps\)\Z"
         )
         proc = subprocess.run(
             ("v4l2-ctl", "--list-formats-ext"),
