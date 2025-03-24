@@ -1,3 +1,10 @@
+qubes-video-companion (1.1.5-1) unstable; urgency=medium
+
+  [ Ali Mirjamali ]
+  * Make Qubes Video Companion available in App menu
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 24 Mar 2025 03:00:17 +0100
+
 qubes-video-companion (1.1.4-1) unstable; urgency=medium
 
   * tests: fail earlier if /dev/video0 doesn't exists
