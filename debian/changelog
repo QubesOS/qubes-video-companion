@@ -1,3 +1,13 @@
+qubes-video-companion (1.1.6-1) unstable; urgency=medium
+
+  [ Ali Mirjamali ]
+  * Revert "Convert icon.png"
+
+  [ Marek Marczykowski-Górecki ]
+  * ci: drop R4.1, add R4.3
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 10 Jul 2025 18:38:35 +0200
+
 qubes-video-companion (1.1.5-1) unstable; urgency=medium
 
   [ Ali Mirjamali ]
