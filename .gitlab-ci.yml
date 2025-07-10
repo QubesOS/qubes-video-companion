@@ -15,17 +15,15 @@ checks:pylint:
     - pylint-3 $(find sender receiver scripts -type f -name '*.py')
 
 include:
-- file: /r4.1/gitlab-base.yml
-  project: QubesOS/qubes-continuous-integration
-- file: /r4.1/gitlab-dom0.yml
-  project: QubesOS/qubes-continuous-integration
-- file: /r4.1/gitlab-vm-fedora.yml
-  project: QubesOS/qubes-continuous-integration
-- file: /r4.1/gitlab-vm-debian.yml
-  project: QubesOS/qubes-continuous-integration
 - file: /r4.2/gitlab-base.yml
   project: QubesOS/qubes-continuous-integration
 - file: /r4.2/gitlab-host.yml
   project: QubesOS/qubes-continuous-integration
 - file: /r4.2/gitlab-vm.yml
+  project: QubesOS/qubes-continuous-integration
+- file: /r4.3/gitlab-base.yml
+  project: QubesOS/qubes-continuous-integration
+- file: /r4.3/gitlab-host.yml
+  project: QubesOS/qubes-continuous-integration
+- file: /r4.3/gitlab-vm.yml
   project: QubesOS/qubes-continuous-integration
