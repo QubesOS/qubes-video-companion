@@ -11,8 +11,13 @@ from typing import NoReturn
 
 
 def main(argv) -> NoReturn:
-    if len(argv) != 1:
-        raise RuntimeError("should not have any arguments")
+    dev_path = "/dev/video0"
+    if len(argv) == 2:
+        dev_path = argv[1]
+    elif len(argv) != 1:
+        raise RuntimeError(
+            "wrong arguments - expected only optional device path"
+        )
 
     width, height, fps = read_video_parameters()
 
@@ -45,7 +50,7 @@ def main(argv) -> NoReturn:
             "use-sink-caps=true",
             "!",
             "v4l2sink",
-            "device=/dev/video0",
+            "device=" + dev_path,
             "sync=false",
         ),
     )

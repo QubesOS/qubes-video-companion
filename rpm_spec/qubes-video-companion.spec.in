@@ -103,10 +103,9 @@ This package contains the video-receiving portion of Qubes Video Companion.
 %{_sysconfdir}/dkms/v4l2loopback.conf
 %{_mandir}/man1/qubes-video-companion.1.gz
 %{_bindir}/qubes-video-companion
-%{_datadir}/qubes-video-companion/receiver/setup.sh
+%{_datadir}/qubes-video-companion/receiver/setup.py
 %{_datadir}/qubes-video-companion/receiver/receiver.py
-%{_datadir}/qubes-video-companion/receiver/destroy.sh
-%{_datadir}/qubes-video-companion/receiver/common.sh
+%{_datadir}/qubes-video-companion/receiver/destroy.py
 /usr/share/applications/qubes-video-companion-webcam.desktop
 /usr/share/applications/qubes-video-companion-screenshare.desktop
 

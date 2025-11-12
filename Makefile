@@ -36,7 +36,7 @@ install-vm: install-both
 	$(INSTALL_DIR) $(DESTDIR)$(BINDIR)
 	$(INSTALL_PROGRAM) receiver/$(PKGNAME) $(DESTDIR)$(BINDIR)
 	$(INSTALL_DIR) $(DESTDIR)$(DATADIR)/$(PKGNAME)/receiver
-	$(INSTALL_PROGRAM) receiver/setup.sh receiver/receiver.py receiver/destroy.sh receiver/common.sh $(DESTDIR)$(DATADIR)/$(PKGNAME)/receiver
+	$(INSTALL_PROGRAM) receiver/setup.py receiver/receiver.py receiver/destroy.py $(DESTDIR)$(DATADIR)/$(PKGNAME)/receiver
 	$(INSTALL_DIR) $(DESTDIR)$(SYSCONFDIR)/qubes/rpc-config
 	echo 'wait-for-session=1' > $(DESTDIR)$(SYSCONFDIR)/qubes/rpc-config/qvc.Webcam
 	echo 'wait-for-session=1' > $(DESTDIR)$(SYSCONFDIR)/qubes/rpc-config/qvc.ScreenShare

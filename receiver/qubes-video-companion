@@ -56,8 +56,7 @@ esac
 exit_clean () {
     exit_code="$?"
 
-    /usr/share/qubes-video-companion/receiver/destroy.sh
-    sudo rm -f "$qvc_lock_file"
+    /usr/share/qubes-video-companion/receiver/destroy.py "$dev_path"
 
     if [ "$video_source" = "webcam" ] && [ "$exit_code" = "141" ]; then
         echo "The webcam device is in use! Please stop any instance of Qubes Video Companion running on another qube." >&2
@@ -67,15 +66,7 @@ exit_clean () {
     exit "$exit_code"
 }
 
-qvc_lock_file="/run/lock/qubes-video-companion"
-if ! [ -f "$qvc_lock_file" ]; then
-    trap exit_clean EXIT
-    sudo touch "$qvc_lock_file"
-else
-    echo "Qubes Video Companion is already running! Please stop the previous session before starting a new one. If you think this is an error, remove the lockfile $qvc_lock_file" >&2
-    exit 1
-fi
-
-/usr/share/qubes-video-companion/receiver/setup.sh
+dev_path=$(/usr/share/qubes-video-companion/receiver/setup.py "$video_source")
+trap exit_clean EXIT
 # Filter standard error escape characters for safe printing to the terminal from the video sender
-qrexec-client-vm --filter-escape-chars-stderr -- "$qube" "$qvc_service+$resolution" /usr/share/qubes-video-companion/receiver/receiver.py
+qrexec-client-vm --filter-escape-chars-stderr -- "$qube" "$qvc_service+$resolution" /usr/share/qubes-video-companion/receiver/receiver.py "$dev_path"
