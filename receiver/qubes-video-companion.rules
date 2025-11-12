@@ -1,0 +1,1 @@
+KERNEL=="v4l2loopback", GROUP="qubes", MODE="0660"

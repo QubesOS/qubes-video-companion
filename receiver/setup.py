@@ -101,6 +101,10 @@ def main(argv):
         subprocess.check_call(
             ["sudo", "--non-interactive", "modprobe", "v4l2loopback"]
         )
+        # wait for udev to apply permission
+        subprocess.check_call(
+            ["udevadm", "wait", "--settle", "/dev/v4l2loopback"]
+        )
     dev_nr = register_device(name)
     print(f"/dev/video{dev_nr}")
 
