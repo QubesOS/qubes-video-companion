@@ -1,0 +1,1 @@
+%qubes ALL = (root) NOPASSWD: /usr/sbin/modprobe v4l2loopback

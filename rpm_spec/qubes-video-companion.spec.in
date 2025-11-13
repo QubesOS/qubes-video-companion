@@ -110,6 +110,7 @@ This package contains the video-receiving portion of Qubes Video Companion.
 /usr/share/applications/qubes-video-companion-screenshare.desktop
 /usr/lib/udev/rules.d/80-qubes-video-companion.rules
 /usr/lib/modprobe.d/qubes-video-companion.conf
+/etc/sudoers.d/qubes-video-companion
 
 %package docs
 Summary:        Documentation for qubes-video-companion
