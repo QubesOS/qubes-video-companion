@@ -91,6 +91,11 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
         source_image = self.capture_from_screen(self.source)
         destination_image = self.capture_from_video(self.view)
         diff = self.compare_images(source_image, destination_image)
+        if diff >= 2.0:
+            with open(f"/tmp/window-dump-{self.id()}-source", "wb") as f:
+                f.write(source_image)
+            with open(f"/tmp/window-dump-{self.id()}-dest", "wb") as f:
+                f.write(destination_image)
         self.assertLess(diff, 2.0)
         self.click_stop(self.source, 'screenshare')
         # wait for device to disappear, or a timeout
@@ -171,6 +176,11 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
         source_image = self.capture_from_video(self.source, ",width=640,height=480")
         source_image = self.apply_mask(source_image)
         diff = self.compare_images(source_image, destination_image)
+        if diff >= 2.5:
+            with open(f"/tmp/window-dump-{self.id()}-source", "wb") as f:
+                f.write(source_image)
+            with open(f"/tmp/window-dump-{self.id()}-dest", "wb") as f:
+                f.write(destination_image)
         self.assertLess(diff, 2.5)
 
 
