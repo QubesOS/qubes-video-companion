@@ -1,3 +1,13 @@
+qubes-video-companion (1.1.7-1) unstable; urgency=medium
+
+  * Dynamically allocate video device
+  * Add module configuration to reduce root usage by qubes-video-
+    companion
+  * Explicitly allow 'sudo modprobe v4l2loopback'
+  * tests: save compared images if they don't match
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 15 Nov 2025 04:09:53 +0100
+
 qubes-video-companion (1.1.6-1) unstable; urgency=medium
 
   [ Ali Mirjamali ]
