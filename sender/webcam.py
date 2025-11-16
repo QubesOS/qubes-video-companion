@@ -20,6 +20,24 @@ class Webcam(Service):
     untrusted_requested_fps: int
 
     def __init__(self, *, untrusted_arg: str):
+        self.port_id = "dev-video0"
+
+        if untrusted_arg:
+            if untrusted_arg.startswith("dev-"):
+                # first arg may be a port id, and then optional resolution arg
+                if "+" in untrusted_arg:
+                    untrusted_port_id, untrusted_arg = (
+                        untrusted_arg.split("+", 1)
+                    )
+                else:
+                    untrusted_port_id, untrusted_arg = untrusted_arg, None
+
+                # currently support only a single port: "dev-video0"
+                if untrusted_port_id != "dev-video0":
+                    print(f"Unsupported webcam port ({untrusted_port_id}), "
+                           "only 'dev-video0' supported", file=sys.stderr)
+                self.port_id = untrusted_port_id
+
         if untrusted_arg:
             def parse_int(untrusted_decimal: bytes) -> int:
                 if not ((1 <= len(untrusted_decimal) <= 4) and
