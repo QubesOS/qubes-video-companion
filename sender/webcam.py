@@ -21,22 +21,21 @@ class Webcam(Service):
 
     def __init__(self, *, untrusted_arg: str):
         if untrusted_arg:
-            untrusted_arg_bytes = untrusted_arg.encode('ascii', 'strict')
             def parse_int(untrusted_decimal: bytes) -> int:
                 if not ((1 <= len(untrusted_decimal) <= 4) and
                         untrusted_decimal.isdigit() and
-                        untrusted_decimal[0] != b"0"):
+                        untrusted_decimal[0] != "0"):
                     print("Invalid argument " + untrusted_arg + ": bad number",
                           file=sys.stderr)
                     sys.exit(1)
                 return int(untrusted_decimal, 10)
-            if len(untrusted_arg_bytes) > 14:
+            if len(untrusted_arg) > 14:
                 # qrexec has already sanitized the argument to some degree,
                 # so this is safe
                 print("Invalid argument " + untrusted_arg +
                       ": too long (limit 14 bytes)", file=sys.stderr)
                 sys.exit(1)
-            arg_list = untrusted_arg_bytes.split(b"+", 4)
+            arg_list = untrusted_arg.split("+", 4)
             if len(arg_list) != 3:
                 print("Invalid argument " + untrusted_arg +
                       ": wrong number of integers (expected 3)",
