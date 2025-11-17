@@ -5,10 +5,20 @@
 # Licensed under the MIT License. See LICENSE file for details.
 
 import sys
+import socket
 import struct
 import os
 from typing import NoReturn
 
+
+def sdnotify(msg):
+    sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+    addr = os.getenv("NOTIFY_SOCKET")
+    if addr[0] == "@":
+        addr = '\0' + addr[1:]
+    sock.connect(addr)
+    sock.sendall(msg)
+    sock.close()
 
 def main(argv) -> NoReturn:
     dev_path = "/dev/video0"
@@ -21,6 +31,8 @@ def main(argv) -> NoReturn:
 
     width, height, fps = read_video_parameters()
 
+    if "NOTIFY_SOCKET" in os.environ:
+        sdnotify(b"READY=1")
     print(
         "Receiving video stream at {}x{} {} FPS...".format(width, height, fps),
         file=sys.stderr,

@@ -6,10 +6,13 @@
 
 """Webcam video source module"""
 
+import atexit
+import os
 import sys
 import re
 import subprocess
 from service import Service
+import qubesdb
 
 
 class Webcam(Service):
@@ -67,6 +70,8 @@ class Webcam(Service):
             self.untrusted_requested_width = 0
             self.untrusted_requested_height = 0
             self.untrusted_requested_fps = 0
+
+        self.pidfile = None
 
         Service.main(self)
 
@@ -169,6 +174,23 @@ class Webcam(Service):
             "!",
             "fdsink",
         ]
+
+    def _cleanup_connect_state(self):
+        qdb = qubesdb.QubesDB()
+        qdb.write(f"/webcam-devices/{self.port_id}/connected-to", "")
+        qdb.write("/webcam-devices", "")
+        if self.pidfile:
+            os.unlink(self.pidfile)
+
+    def record_connect_state(self, remote_domain) -> None:
+        self.pidfile = f"/run/qubes/qvc-webcam-{self.port_id}"
+        with open(self.pidfile, "w", encoding="ascii") as f_pid:
+            f_pid.write(f"{os.getpid()}\n")
+
+        qdb = qubesdb.QubesDB()
+        qdb.write(f"/webcam-devices/{self.port_id}/connected-to", remote_domain)
+        qdb.write("/webcam-devices", "")
+        atexit.register(self._cleanup_connect_state)
 
 
 if __name__ == "__main__":

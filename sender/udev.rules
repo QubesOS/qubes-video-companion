@@ -1,0 +1,2 @@
+# for now publish only /dev/video0
+KERNEL=="video0", RUN+="/usr/share/qubes-video-companion/sender/udev-handler"

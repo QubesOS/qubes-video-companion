@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qvc"
+version = "4.3"
+description = "QVC plugin for qubes-core-admin"
+license = { text = "MIT" }
+
+[project.urls]
+Homepage = "https://www.qubes-os.org/"
+Documentation = "https://readthedocs.org"
+Repository = "https://github.com/QubesOS/qubes-video-companion.git"
+"Bug Tracker" = "https://github.com/QubesOS/qubes-issues/issues"
+
+[project.entry-points."qubes.ext"]
+webcam = "qvc:WebcamDeviceExtension"
+
+[project.entry-points."qubes.devices"]
+webcam = "qvc:WebcamDevice"

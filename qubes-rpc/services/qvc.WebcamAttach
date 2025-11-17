@@ -1,0 +1,11 @@
+#!/bin/sh --
+set -eu
+
+read -r domain arg
+cursor=$(journalctl -n 0 -q --show-cursor | cut -d ' ' -f 3-)
+unit="qubes-video-companion-webcam@$domain+$arg.service"
+if ! systemctl -q start "$unit"; then
+    journalctl --no-pager --after-cursor="$cursor" --unit="$unit" --output=cat |
+        grep -v 'service: Main process exited\|service: Failed with result\|^Starting' >&2
+    exit 1
+fi

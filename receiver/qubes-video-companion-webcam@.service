@@ -1,0 +1,7 @@
+[Unit]
+Description=Qubes Video Companion - webcam
+
+[Service]
+Type=notify
+ExecStart=/usr/bin/qubes-video-companion "--instance-arg=%i" webcam
+NotifyAccess=all

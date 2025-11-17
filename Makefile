@@ -9,6 +9,7 @@ DATADIR ?= /usr/share
 SYSCONFDIR ?= /etc
 QREXECSERVICEDIR ?= $(SYSCONFDIR)/qubes-rpc
 QREXECPOLICYDIR ?= $(SYSCONFDIR)/qubes/policy.d
+UDEVDIR ?= /usr/lib/udev/rules.d
 PYTHON ?= python3
 
 INSTALL_DIR = install -d --
@@ -40,6 +41,7 @@ install-vm: install-both
 	$(INSTALL_DATA) receiver/qubes-video-companion.rules $(DESTDIR)/usr/lib/udev/rules.d/80-qubes-video-companion.rules
 	$(INSTALL_DATA) receiver/qubes-video-companion.modprobe $(DESTDIR)/usr/lib/modprobe.d/qubes-video-companion.conf
 	$(INSTALL_DATA) receiver/qubes-video-companion.sudoers $(DESTDIR)/etc/sudoers.d/qubes-video-companion
+	$(INSTALL_DATA) receiver/qubes-video-companion-webcam@.service $(DESTDIR)/usr/lib/systemd/system/qubes-video-companion-webcam@.service
 	$(INSTALL_DIR) $(DESTDIR)$(SYSCONFDIR)/qubes/rpc-config
 	echo 'wait-for-session=1' > $(DESTDIR)$(SYSCONFDIR)/qubes/rpc-config/qvc.Webcam
 	echo 'wait-for-session=1' > $(DESTDIR)$(SYSCONFDIR)/qubes/rpc-config/qvc.ScreenShare
@@ -56,9 +58,16 @@ install-dom0: install-both install-policy install-tests
 
 install-both:
 	$(INSTALL_DIR) $(DESTDIR)$(QREXECSERVICEDIR)
-	$(INSTALL_PROGRAM) qubes-rpc/services/qvc.Webcam qubes-rpc/services/qvc.ScreenShare $(DESTDIR)$(QREXECSERVICEDIR)
+	$(INSTALL_PROGRAM) qubes-rpc/services/qvc.Webcam \
+		qubes-rpc/services/qvc.ScreenShare \
+		$(DESTDIR)$(QREXECSERVICEDIR)
+	$(INSTALL_PROGRAM) qubes-rpc/services/qvc.WebcamAttach \
+		qubes-rpc/services/qvc.WebcamDetach \
+		$(DESTDIR)$(QREXECSERVICEDIR)
 	$(INSTALL_DIR) $(DESTDIR)$(DATADIR)/$(PKGNAME)/sender
 	$(INSTALL_PROGRAM) sender/*.py $(DESTDIR)$(DATADIR)/$(PKGNAME)/sender
+	$(INSTALL_PROGRAM) scripts/udev-handler $(DESTDIR)$(DATADIR)/$(PKGNAME)/sender/
+	$(INSTALL_PROGRAM) sender/udev.rules $(DESTDIR)$(UDEVDIR)/80-qubes-video-companion-sender.rules
 	$(INSTALL_DIR) $(DESTDIR)$(DATADIR)/doc/$(PKGNAME)
 	$(INSTALL_DATA) README.md doc/pipeline.md $(DESTDIR)$(DATADIR)/doc/$(PKGNAME)
 	$(INSTALL_DIR) $(DESTDIR)$(DATADIR)/doc/$(PKGNAME)/visualizations
