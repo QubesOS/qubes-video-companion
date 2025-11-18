@@ -1,0 +1,3 @@
+[action:qvc-modprobe-v4l2loopback]
+Command=modprobe v4l2loopback
+AuthorizedGroups=sudo,privleap,qubes

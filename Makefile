@@ -40,6 +40,8 @@ install-vm: install-both
 	$(INSTALL_DATA) receiver/qubes-video-companion.rules $(DESTDIR)/usr/lib/udev/rules.d/80-qubes-video-companion.rules
 	$(INSTALL_DATA) receiver/qubes-video-companion.modprobe $(DESTDIR)/usr/lib/modprobe.d/qubes-video-companion.conf
 	$(INSTALL_DATA) receiver/qubes-video-companion.sudoers $(DESTDIR)/etc/sudoers.d/qubes-video-companion
+	$(INSTALL_DIR) $(DESTDIR)/etc/privleap/conf.d
+	$(INSTALL_DATA) receiver/qubes-video-companion.privleap $(DESTDIR)/etc/privleap/conf.d/qubes-video-companion.conf
 	$(INSTALL_DIR) $(DESTDIR)$(SYSCONFDIR)/qubes/rpc-config
 	echo 'wait-for-session=1' > $(DESTDIR)$(SYSCONFDIR)/qubes/rpc-config/qvc.Webcam
 	echo 'wait-for-session=1' > $(DESTDIR)$(SYSCONFDIR)/qubes/rpc-config/qvc.ScreenShare

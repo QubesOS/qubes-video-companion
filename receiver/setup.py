@@ -10,6 +10,7 @@ import struct
 import os
 import fcntl
 import subprocess
+import shutil
 
 # see v4l2loopback.h:
 #    __s32 output_nr;
@@ -91,6 +92,17 @@ def register_device(name):
         os.close(ctrl_fd)
 
 
+def try_esc_exec(exe, cmdline):
+    if shutil.which(exe) is not None:
+        try:
+            subprocess.check_call([exe, *cmdline])
+        except Exception:
+            return False
+    else:
+        return False
+    return True
+
+
 def main(argv):
     name = None
     if len(argv) == 2:
@@ -98,9 +110,22 @@ def main(argv):
     elif len(argv) != 1:
         raise RuntimeError("Invalid arguments - usage: setup.py [name]")
     if not os.path.exists("/dev/v4l2loopback"):
-        subprocess.check_call(
-            ["sudo", "--non-interactive", "modprobe", "v4l2loopback"]
-        )
+        if (
+            not try_esc_exec(
+                "sudo",
+                [
+                    "--non-interactive",
+                    "modprobe",
+                    "v4l2loopback",
+                ],
+            )
+            and not try_esc_exec(
+                "leaprun", ["qvc-modprobe-v4l2loopback"]
+            )
+        ):
+            raise RuntimeError(
+                "Cannot escalate privileges to modprobe v4l2loopback"
+            )
         # wait for udev to apply permission
         subprocess.check_call(
             ["udevadm", "wait", "--settle", "/dev/v4l2loopback"]

@@ -111,6 +111,7 @@ This package contains the video-receiving portion of Qubes Video Companion.
 /usr/lib/udev/rules.d/80-qubes-video-companion.rules
 /usr/lib/modprobe.d/qubes-video-companion.conf
 /etc/sudoers.d/qubes-video-companion
+/etc/privleap/conf.d/qubes-video-companion.conf
 
 %package docs
 Summary:        Documentation for qubes-video-companion
