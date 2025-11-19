@@ -4,6 +4,12 @@ from math import sqrt
 
 import qubes.tests.extra
 
+try:
+    import qvc
+    have_qvc = True
+except ImportError:
+    have_qvc = False
+
 
 class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
     def setUp(self):
@@ -24,6 +30,15 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
             'done; sleep 1; test -e /dev/video0', wait=True)
         self.assertEqual(retcode, 0,
                          f"Timeout waiting for /dev/video0 in {vm.name}")
+
+    def wait_for_webcam(self, vm):
+        timeout = 30
+        for i in range(timeout):
+            if len(list(vm._vm.devices["webcam"].get_exposed_devices())):
+                break
+            self.loop.run_until_complete(asyncio.sleep(0.5))
+        else:
+            self.fail(f"Timeout waiting for webcam device in {vm.name}")
 
     def wait_for_video0_disconnect(self, vm):
         vm.run(
@@ -134,6 +149,12 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
 
         return bytes(image)
 
+    def get_default_video_format(self, vm, device="/dev/video0"):
+        """Get current format of a video device"""
+        cmd = f"v4l2-ctl -d {device} --get-fmt-video | grep -o '[0-9]\\+/[0-9]\\+'"
+        p = vm.run(cmd, passio_popen=True)
+        stdout, _ = p.communicate()
+        return stdout.decode().strip().split('/')
 
     def test_020_webcam(self):
         """Webcam test
@@ -172,6 +193,96 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
             # just print
             print(stdout)
             print(stderr)
+
+        # vivid supports only one client at a time, so capture source only
+        # after QVC disconnects
+        source_image = self.capture_from_video(self.source, ",width=640,height=480")
+        source_image = self.apply_mask(source_image)
+        diff = self.compare_images(source_image, destination_image)
+        if diff >= 2.5:
+            with open(f"/tmp/window-dump-{self.id()}-source", "wb") as f:
+                f.write(source_image)
+            with open(f"/tmp/window-dump-{self.id()}-dest", "wb") as f:
+                f.write(destination_image)
+        self.assertLess(diff, 2.5)
+
+    @unittest.skipIf(not have_qvc, "qvc not installed")
+    def test_021_webcam_qvm_device(self):
+        """Webcam test
+
+        source -> view (webcam)
+        """
+        self.loop.run_until_complete(self.wait_for_session(self.source))
+        self.view.start()
+        self.loop.run_until_complete(self.wait_for_session(self.view))
+        ret = self.source.run("modprobe vivid", user="root", wait=True)
+        if ret != 0:
+            self.skipTest("Cannot load 'vivid' module")
+        # wait for device to appear, or a timeout
+        self.wait_for_webcam(self.source)
+
+        p = self.loop.run_until_complete(asyncio.create_subprocess_exec(
+            "qvm-device", "webcam", "attach", self.view.name,
+            f"{self.source.name}:dev-video0",
+        ))
+        self.loop.run_until_complete(p.wait())
+        self.wait_for_video0(self.view)
+
+        destination_image = self.capture_from_video(self.view)
+        destination_image_dims = self.get_default_video_format(self.view)
+        destination_image = self.apply_mask(destination_image)
+        p = self.loop.run_until_complete(asyncio.create_subprocess_exec(
+            "qvm-device", "webcam", "detach", self.view.name,
+            f"{self.source.name}:dev-video0"
+        ))
+        self.loop.run_until_complete(p.wait())
+        self.wait_for_video0_disconnect(self.view)
+
+        # vivid supports only one client at a time, so capture source only
+        # after QVC disconnects
+        source_image = self.capture_from_video(
+            self.source, ",width={},height={}".format(*destination_image_dims)
+        )
+        source_image = self.apply_mask(source_image)
+        diff = self.compare_images(source_image, destination_image)
+        if diff >= 2.5:
+            with open(f"/tmp/window-dump-{self.id()}-source", "wb") as f:
+                f.write(source_image)
+            with open(f"/tmp/window-dump-{self.id()}-dest", "wb") as f:
+                f.write(destination_image)
+        self.assertLess(diff, 2.5)
+
+    @unittest.skipIf(not have_qvc, "qvc not installed")
+    def test_022_webcam_qvm_device_resolution(self):
+        """Webcam test
+
+        source -> view (webcam)
+        """
+        self.loop.run_until_complete(self.wait_for_session(self.source))
+        self.view.start()
+        self.loop.run_until_complete(self.wait_for_session(self.view))
+        ret = self.source.run("modprobe vivid", user="root", wait=True)
+        if ret != 0:
+            self.skipTest("Cannot load 'vivid' module")
+        # wait for device to appear, or a timeout
+        self.wait_for_webcam(self.source)
+
+        p = self.loop.run_until_complete(asyncio.create_subprocess_exec(
+            "qvm-device", "webcam", "attach", self.view.name,
+            f"{self.source.name}:dev-video0",
+            "-o", "format=640x480x30",
+        ))
+        self.loop.run_until_complete(p.wait())
+        self.wait_for_video0(self.view)
+
+        destination_image = self.capture_from_video(self.view)
+        destination_image = self.apply_mask(destination_image)
+        p = self.loop.run_until_complete(asyncio.create_subprocess_exec(
+            "qvm-device", "webcam", "detach", self.view.name,
+            f"{self.source.name}:dev-video0"
+        ))
+        self.loop.run_until_complete(p.wait())
+        self.wait_for_video0_disconnect(self.view)
 
         # vivid supports only one client at a time, so capture source only
         # after QVC disconnects
