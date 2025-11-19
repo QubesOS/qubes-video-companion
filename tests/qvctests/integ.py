@@ -8,6 +8,8 @@ import qubes.tests.extra
 class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
     def setUp(self):
         super(TC_00_QVCTest, self).setUp()
+        if "webcam" in self.id() and "whonix" in str(self.template):
+            self.skipTest("Cannot load 'vivid' module on Whonix")
         self.source, self.view = self.create_vms(
             ["source", "view"])
         self.source.start()
