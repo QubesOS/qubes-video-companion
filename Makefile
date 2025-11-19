@@ -66,6 +66,7 @@ install-both:
 		$(DESTDIR)$(QREXECSERVICEDIR)
 	$(INSTALL_DIR) $(DESTDIR)$(DATADIR)/$(PKGNAME)/sender
 	$(INSTALL_PROGRAM) sender/*.py $(DESTDIR)$(DATADIR)/$(PKGNAME)/sender
+	$(INSTALL_PROGRAM) scripts/webcam-formats/webcam_formats.py $(DESTDIR)$(DATADIR)/$(PKGNAME)/sender/
 	$(INSTALL_PROGRAM) scripts/udev-handler $(DESTDIR)$(DATADIR)/$(PKGNAME)/sender/
 	$(INSTALL_PROGRAM) sender/udev.rules $(DESTDIR)$(UDEVDIR)/80-qubes-video-companion-sender.rules
 	$(INSTALL_DIR) $(DESTDIR)$(DATADIR)/doc/$(PKGNAME)

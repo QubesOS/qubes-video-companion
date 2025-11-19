@@ -40,6 +40,7 @@ fi
 if [ "$ACTION" = "add" ]; then
     qubesdb-write "/webcam-devices/$portid/connected-to" ""
 fi
+python3 /usr/share/qubes-video-companion/sender/webcam_formats.py --portid="$portid" --device="$DEVNAME" publish
 
 # trigger watch
 qubesdb-write "/webcam-devices" ""

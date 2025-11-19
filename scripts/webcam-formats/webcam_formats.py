@@ -5,8 +5,10 @@
 
 """Get and compare supported webcam formats"""
 
+import argparse
 import subprocess
 from collections import OrderedDict
+import qubesdb
 
 
 class WebcamFormats:
@@ -37,7 +39,7 @@ class WebcamFormats:
         while self.__line_idx < self.formats_len:
             line = self.formats[self.__line_idx]
 
-            if line.startswith("Index"):
+            if line.startswith("["):
                 self.__index()
 
             self.__line_idx = self.__line_idx + 1
@@ -51,9 +53,9 @@ class WebcamFormats:
         while self.__line_idx < self.formats_len:
             line = self.formats[self.__line_idx]
 
-            if line.startswith("Pixel Format"):
+            if line.startswith("["):
                 # Remove removing surrounding single quotes (') junk
-                pix_fmt = line.split()[2].replace("'", "")
+                pix_fmt = line.split()[1].replace("'", "")
                 self.pix_fmt[pix_fmt] = {}
 
             if line.startswith("Size"):
@@ -137,6 +139,24 @@ class WebcamFormats:
                 self.selected_fps = current_selected_fps
                 break
 
+    def publish_formats_info(self, portid):
+        qdb = qubesdb.QubesDB()
+        prefix = f"/webcam-devices/{portid}"
+        # remove old entries
+        qdb.rm(prefix + "/formats/")
+        formats = (
+                (w, h, fps)
+                for pix_fmt, size_dict in self.pix_fmt.items()
+                for (w, h), fps_list in size_dict.items()
+                for fps in fps_list
+                )
+        format_nr = 0
+        for width, height, fps in sorted(set(formats)):
+            qdb.write(f"{prefix}/formats/{format_nr:02d}",
+                      f"{width}x{height}x{fps}")
+            format_nr += 1
+
+
     def configure_webcam_best_format(self):
         """Configure webcam device to use the best format"""
 
@@ -162,3 +182,43 @@ class WebcamFormats:
             ],
             check=True,
         )
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--device", help="/dev/video* device path")
+    parser.add_argument("--portid",
+        help="QVC device portid for publishing in qubesdb")
+    parser.add_argument("action", help="Action to perform; supported: publish")
+
+    args = parser.parse_args()
+
+    if args.action != "publish":
+        parser.error("Unsupported action: " + args.action)
+
+    if args.device and not args.portid:
+        parser.error(
+            "portid mandatory for publish action, if alternative device is set"
+        )
+
+    if not args.device:
+        args.device = "/dev/video0"
+        args.portid = "dev-video0"
+
+    webcam_supported_formats = (
+        subprocess.run(
+            ["v4l2-ctl", "--device", args.device, "--list-formats-ext"],
+            stdout=subprocess.PIPE,
+            check=True,
+        )
+        .stdout.decode("utf-8")
+        .replace("\t", "")
+        .splitlines()
+    )
+
+    webcam_settings = WebcamFormats(webcam_supported_formats, args.device)
+    webcam_settings.publish_formats_info(args.portid)
+
+
+
+if __name__ == "__main__":
+    main()

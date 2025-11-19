@@ -19,7 +19,7 @@ from qubes.utils import sanitize_stderr_for_log
 name_re = re.compile(r"\A[a-z0-9-]{1,12}\Z")
 device_re = re.compile(r"\A[a-z0-9/-]{1,64}\Z")
 connected_to_re = re.compile(rb"^[a-zA-Z][a-zA-Z0-9_.-]*$")
-
+format_re = re.compile(r"\A^[1-9][0-9]{0,3}x[1-9][0-9]{0,3}x[1-9][0-9]{0,2}\Z")
 
 class WebcamDevice(qubes.device_protocol.DeviceInfo):
     def __init__(self, port: qubes.device_protocol.Port):
@@ -33,7 +33,7 @@ class WebcamDevice(qubes.device_protocol.DeviceInfo):
 
         self._qdb_path = f"/webcam-devices/{port.port_id}"
 
-        # TODO: available res, fps
+        self._formats = None
 
     @property
     def interfaces(self) -> List[DeviceInterface]:
@@ -157,6 +157,38 @@ class WebcamDevice(qubes.device_protocol.DeviceInfo):
             )
             return None
         return connected_to
+
+    @property
+    def formats(self):
+        if self._formats is None:
+            untrusted_formats = self.backend_domain.untrusted_qdb.multiread(
+                self._qdb_path + "/formats/"
+            )
+            formats = []
+            for _, untrusted_format in untrusted_formats.items():
+                untrusted_format = untrusted_format.decode("ascii", errors="strict")
+                if not format_re.match(untrusted_format):
+                    self.backend_domain.log.warning("Invalid format")
+                    continue
+                formats.append(untrusted_format)
+            self._formats = " ".join(formats)
+        return self._formats
+
+    @property
+    def data(self):
+        """Return extra attributes for serialization"""
+        return {
+            "formats": self.formats,
+        }
+
+    @data.setter
+    def data(self, data):
+        """Setter for 'data' attribute, to make DeviceInfo class happy"""
+        # not really used, but DeviceInfo constructor tries to set it,
+        # so accept (and ignore) empty value
+        if data == {}:
+            return
+        raise AttributeError("read-only attribute data")
 
 
 class QVCNotInstalled(QubesException):
@@ -300,9 +332,14 @@ class WebcamDeviceExtension(qubes.ext.Extension):
 
         arg = device.port_id
 
-        # TODO: options for res/fps
         if options:
-            raise QubesException("Options not supported")
+            for option, value in options.items():
+                if option == "format":
+                    if not format_re.match(value):
+                        raise QubesException("Invalid format value")
+                    arg += "+" + value.replace("x", "+")
+                else:
+                    raise QubesException("Unsupported option: '{}'".format(option))
 
         if not vm.is_running() or vm.qid == 0:
             # print(f"Qube is not running, skipping attachment of {device}",
@@ -376,8 +413,14 @@ class WebcamDeviceExtension(qubes.ext.Extension):
     @qubes.ext.handler("device-pre-assign:webcam")
     async def on_device_assign_webcam(self, vm, event, device, options):
         # pylint: disable=unused-argument
-        pass
-        # TODO: verify options
+        # validate options
+        if options:
+            for option, value in options.items():
+                if option == "format":
+                    if not format_re.match(value):
+                        raise QubesException("Invalid format value")
+                else:
+                    raise QubesException("Unsupported option: '{}'".format(option))
 
     @qubes.ext.handler("domain-start")
     async def on_domain_start(self, vm, _event, **_kwargs):
