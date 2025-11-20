@@ -1,3 +1,15 @@
+qubes-video-companion (4.3.0-1) unstable; urgency=medium
+
+  * Simplify arg parsing
+  * Add placeholder for camera selection support
+  * Implement base integration with qvm-device API
+  * Add format selection to qvm-device integration
+  * tests: skip webcam tests on Whonix earlier
+  * tests: qvm-device integration
+  * ci: add interface mockup for pylint
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 20 Nov 2025 13:56:50 +0100
+
 qubes-video-companion (1.1.8-1) unstable; urgency=medium
 
   [ Aaron Rainbolt ]
