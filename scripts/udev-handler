@@ -1,0 +1,46 @@
+#!/bin/sh
+
+set -eu
+
+portid="dev-$(basename "${DEVPATH}")"
+
+if [ "$ACTION" = "remove" ]; then
+    # remove content and the entry itself
+    qubesdb-rm "/webcam-devices/$portid/" "/webcam-devices/$portid"
+    # trigger watch
+    qubesdb-write "/webcam-devices" ""
+    exit
+fi
+
+if [ "$ACTION" != "add" ] && [ "$ACTION" != "change" ]; then
+    echo "Unknown action '$ACTION'" >&2
+    exit 2
+fi
+
+if ! [ -e "/sys/$DEVPATH/device" ]; then
+    # ignore virtual devices created by QVC itself
+    if grep -q "^QVC -" "/sys/$DEVPATH/name"; then
+        exit
+    fi
+fi
+
+parent=
+
+# for now support only USB parent device
+if [ "${ID_BUS-}" = "usb" ]; then
+    parent_devpath=$(readlink -f "/sys/$DEVPATH/device")
+    parent_devid="${parent_devpath##*/}"
+    parent_devid="${parent_devid%%:*}"
+    parent="usb:$parent_devid"
+fi
+
+if [ -n "$parent" ]; then
+    qubesdb-write "/webcam-devices/$portid/parent" "$parent"
+fi
+if [ "$ACTION" = "add" ]; then
+    qubesdb-write "/webcam-devices/$portid/connected-to" ""
+fi
+python3 /usr/share/qubes-video-companion/sender/webcam_formats.py --portid="$portid" --device="$DEVNAME" publish
+
+# trigger watch
+qubesdb-write "/webcam-devices" ""

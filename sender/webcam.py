@@ -6,10 +6,13 @@
 
 """Webcam video source module"""
 
+import atexit
+import os
 import sys
 import re
 import subprocess
 from service import Service
+import qubesdb
 
 
 class Webcam(Service):
@@ -20,23 +23,40 @@ class Webcam(Service):
     untrusted_requested_fps: int
 
     def __init__(self, *, untrusted_arg: str):
+        self.port_id = "dev-video0"
+
         if untrusted_arg:
-            untrusted_arg_bytes = untrusted_arg.encode('ascii', 'strict')
+            if untrusted_arg.startswith("dev-"):
+                # first arg may be a port id, and then optional resolution arg
+                if "+" in untrusted_arg:
+                    untrusted_port_id, untrusted_arg = (
+                        untrusted_arg.split("+", 1)
+                    )
+                else:
+                    untrusted_port_id, untrusted_arg = untrusted_arg, None
+
+                # currently support only a single port: "dev-video0"
+                if untrusted_port_id != "dev-video0":
+                    print(f"Unsupported webcam port ({untrusted_port_id}), "
+                           "only 'dev-video0' supported", file=sys.stderr)
+                self.port_id = untrusted_port_id
+
+        if untrusted_arg:
             def parse_int(untrusted_decimal: bytes) -> int:
                 if not ((1 <= len(untrusted_decimal) <= 4) and
                         untrusted_decimal.isdigit() and
-                        untrusted_decimal[0] != b"0"):
+                        untrusted_decimal[0] != "0"):
                     print("Invalid argument " + untrusted_arg + ": bad number",
                           file=sys.stderr)
                     sys.exit(1)
                 return int(untrusted_decimal, 10)
-            if len(untrusted_arg_bytes) > 14:
+            if len(untrusted_arg) > 14:
                 # qrexec has already sanitized the argument to some degree,
                 # so this is safe
                 print("Invalid argument " + untrusted_arg +
                       ": too long (limit 14 bytes)", file=sys.stderr)
                 sys.exit(1)
-            arg_list = untrusted_arg_bytes.split(b"+", 4)
+            arg_list = untrusted_arg.split("+", 4)
             if len(arg_list) != 3:
                 print("Invalid argument " + untrusted_arg +
                       ": wrong number of integers (expected 3)",
@@ -50,6 +70,8 @@ class Webcam(Service):
             self.untrusted_requested_width = 0
             self.untrusted_requested_height = 0
             self.untrusted_requested_fps = 0
+
+        self.pidfile = None
 
         Service.main(self)
 
@@ -152,6 +174,23 @@ class Webcam(Service):
             "!",
             "fdsink",
         ]
+
+    def _cleanup_connect_state(self):
+        qdb = qubesdb.QubesDB()
+        qdb.write(f"/webcam-devices/{self.port_id}/connected-to", "")
+        qdb.write("/webcam-devices", "")
+        if self.pidfile:
+            os.unlink(self.pidfile)
+
+    def record_connect_state(self, remote_domain) -> None:
+        self.pidfile = f"/run/qubes/qvc-webcam-{self.port_id}"
+        with open(self.pidfile, "w", encoding="ascii") as f_pid:
+            f_pid.write(f"{os.getpid()}\n")
+
+        qdb = qubesdb.QubesDB()
+        qdb.write(f"/webcam-devices/{self.port_id}/connected-to", remote_domain)
+        qdb.write("/webcam-devices", "")
+        atexit.register(self._cleanup_connect_state)
 
 
 if __name__ == "__main__":

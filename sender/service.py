@@ -52,6 +52,8 @@ class Service:
 
         self._tray_icon = tray_icon.TrayIcon(app, icon, msg)
 
+        self.record_connect_state(remote_domain)
+
     def video_source(self) -> str:
         """
         Return the video source
@@ -85,6 +87,11 @@ class Service:
         self._quitting = True
         self._element.set_state(Gst.State.NULL)
         Gtk.main_quit()
+
+    def record_connect_state(self, remote_domain) -> None:
+        """
+        Record state of stream, for the disconnect purpose.
+        """
 
     def msg_handler(self, _bus: Gst.Bus, msg: Gst.Message) -> None:
         """Handle pipeline messages"""

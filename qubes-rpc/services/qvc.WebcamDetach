@@ -1,0 +1,21 @@
+#!/bin/sh
+
+portid="$1"
+
+if [ "$portid" != "dev-video0" ]; then
+    echo "Unsupported port id!" >&2
+    exit 2
+fi
+
+pidfile="/run/qubes/qvc-webcam-$portid"
+if [ -r "$pidfile" ]; then
+    pid="$(cat "$pidfile")"
+    # safety check, just in case the process exited without cleaning up
+    if ! grep -q webcam.py "/proc/$pid/cmdline" 2>/dev/null; then
+        # can't kill...
+        rm -f "$pidfile"
+        echo "Can't find QVC process (PID $pid), already exited?" >&2
+        exit 1
+    fi
+    kill -- "$pid"
+fi

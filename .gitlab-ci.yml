@@ -12,6 +12,7 @@ checks:pylint:
   before_script:
     - sudo dnf install -y python3-gobject gtk3 python3-pylint
   script:
+    - export PYTHONPATH=ci/test-packages
     - pylint-3 $(find sender receiver scripts -type f -name '*.py')
 
 include:

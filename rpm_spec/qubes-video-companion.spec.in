@@ -14,6 +14,7 @@ BuildArch:      noarch
 
 BuildRequires:  pandoc
 BuildRequires:  make
+BuildRequires:  systemd-rpm-macros
 Requires:       qubes-video-companion-sender
 Requires:       qubes-video-companion-receiver
 Requires:       qubes-video-companion-license
@@ -62,13 +63,17 @@ This package contains the video-sending portion of Qubes Video Companion.
 
 %files sender
 %{_sysconfdir}/qubes-rpc/qvc.Webcam
+%{_sysconfdir}/qubes-rpc/qvc.WebcamDetach
 %{_sysconfdir}/qubes-rpc/qvc.ScreenShare
 %{_sysconfdir}/qubes/rpc-config/qvc.Webcam
 %{_sysconfdir}/qubes/rpc-config/qvc.ScreenShare
+/usr/lib/udev/rules.d/80-qubes-video-companion-sender.rules
 %{_datadir}/qubes-video-companion/sender/service.py
 %{_datadir}/qubes-video-companion/sender/webcam.py
+%{_datadir}/qubes-video-companion/sender/webcam_formats.py
 %{_datadir}/qubes-video-companion/sender/screenshare.py
 %{_datadir}/qubes-video-companion/sender/tray_icon.py
+%{_datadir}/qubes-video-companion/sender/udev-handler
 
 %package receiver
 Summary:        Video receiver part of qubes-video-companion
@@ -101,11 +106,13 @@ This package contains the video-receiving portion of Qubes Video Companion.
 
 %files receiver
 %{_sysconfdir}/dkms/v4l2loopback.conf
+%{_sysconfdir}/qubes-rpc/qvc.WebcamAttach
 %{_mandir}/man1/qubes-video-companion.1.gz
 %{_bindir}/qubes-video-companion
 %{_datadir}/qubes-video-companion/receiver/setup.py
 %{_datadir}/qubes-video-companion/receiver/receiver.py
 %{_datadir}/qubes-video-companion/receiver/destroy.py
+%{_unitdir}/qubes-video-companion-webcam@.service
 /usr/share/applications/qubes-video-companion-webcam.desktop
 /usr/share/applications/qubes-video-companion-screenshare.desktop
 /usr/lib/udev/rules.d/80-qubes-video-companion.rules

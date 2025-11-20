@@ -11,7 +11,8 @@
 # GI requires version declaration before importing
 # pylint: disable=wrong-import-position
 
-from os import _exit
+import signal
+import sys
 from typing import NoReturn
 
 import gi
@@ -76,11 +77,12 @@ class TrayIcon:
         def die(unused_gtk) -> NoReturn:
             # We do not care about cleaning up properly here; the OS will do
             # that for us.  We *do* care about exiting ASAP.
-            _exit(0)
+            sys.exit(0)
 
         entry = Gtk.MenuItem.new_with_label("Stop video transmission")
         entry.connect("activate", die)
         menu.connect("destroy", die)
+        signal.signal(signal.SIGTERM, lambda *_args: die(None))
         menu.append(entry)
 
         menu.show_all()

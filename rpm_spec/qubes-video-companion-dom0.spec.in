@@ -17,6 +17,8 @@ BuildArch:      noarch
 BuildRequires:  make
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-devel
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
 
 Requires:       gstreamer1-plugins-good
 Requires:       v4l-utils
@@ -56,9 +58,21 @@ necessary for dom0.
 %define  __python %{__pythonX}
 %make_build
 
+%if 0%{?fedora} >= 41
+pushd core3ext
+%pyproject_wheel
+popd
+%endif
+
 %install
 rm -rf $RPM_BUILD_ROOT
 make DESTDIR=%{?buildroot} install-dom0 install-license
+
+%if 0%{?fedora} >= 41
+pushd core3ext
+%pyproject_install
+popd
+%endif
 
 %files
 %{_licensedir}/qubes-video-companion/LICENSE
@@ -66,14 +80,23 @@ make DESTDIR=%{?buildroot} install-dom0 install-license
 %{_docdir}/qubes-video-companion/pipeline.md
 %{_docdir}/qubes-video-companion/visualizations/*
 %{_sysconfdir}/qubes-rpc/qvc.Webcam
+%{_sysconfdir}/qubes-rpc/qvc.WebcamAttach
+%{_sysconfdir}/qubes-rpc/qvc.WebcamDetach
 %{_sysconfdir}/qubes-rpc/qvc.ScreenShare
 %{_sysconfdir}/qubes/policy.d/90-default-video-companion.policy
+/usr/lib/udev/rules.d/80-qubes-video-companion-sender.rules
 %{_datadir}/qubes-video-companion/sender/service.py
 %{_datadir}/qubes-video-companion/sender/webcam.py
+%{_datadir}/qubes-video-companion/sender/webcam_formats.py
 %{_datadir}/qubes-video-companion/sender/screenshare.py
 %{_datadir}/qubes-video-companion/sender/tray_icon.py
+%{_datadir}/qubes-video-companion/sender/udev-handler
 %{python3_sitelib}/qvctests
 %{python3_sitelib}/qvctests-*.egg-info
+%if 0%{?fedora} >= 41
+%{python3_sitelib}/qvc/
+%{python3_sitelib}/qvc-*.dist-info/
+%endif
 
 %changelog
 @CHANGELOG@

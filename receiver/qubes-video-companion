@@ -12,13 +12,15 @@ unset GETOPT_COMPATIBLE
 name=${0##*/}
 
 usage() {
-    echo "Usage: $name [--resolution=[WIDTHxHEIGHTxFPS]] [--] webcam|screenshare [destination qube]" >&2
+    echo "Usage: $name [--instance-arg=...] [--resolution=[WIDTHxHEIGHTxFPS]] [--] webcam|screenshare [destination qube]" >&2
     echo "Resolution example: 1920x1080x60"
+    echo "--instance-arg is used internally when started via systemd"
     exit "$1"
 }
 
 resolution=
-opts=$(getopt "--name=$name" --longoptions=resolution:,help -- r: "$@") || exit
+instance_arg=
+opts=$(getopt "--name=$name" --longoptions=resolution:,help,instance-arg: -- r: "$@") || exit
 eval "set -- $opts"
 while :; do
     case $1 in
@@ -31,6 +33,14 @@ while :; do
             resolution=${resolution//x/+}
             shift 2
             ;;
+        --instance-arg)
+            if [[ -z "$2" ]]; then
+                echo "$name: missing instance arg value" >&2
+                usage 1 >&2
+            fi
+            instance_arg="${2//\\x2b/+}"
+            shift 2
+            ;;
         -h|--help) usage 0;;
         --) shift; break;;
         *) exit 1;; # cannot happen
@@ -40,6 +50,17 @@ done
 if [ "$#" -gt 2 ] || [ "$#" -lt 1 ]; then usage 1 >&2; fi
 
 video_source="$1" qube=${2-'@default'}
+
+if [[ "$qube" != "@default" ]] && [[ -n "$instance_arg" ]]; then
+    echo "Cannot use --instance-arg together with destination qube" >&2
+    exit 1
+fi
+
+if [[ -n "$instance_arg" ]]; then
+    qube="${instance_arg%%+*}"
+    # in reality full qrexec arg
+    resolution="${instance_arg#*+}"
+fi
 
 case "$video_source" in
     webcam)
