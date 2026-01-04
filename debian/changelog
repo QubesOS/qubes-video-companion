@@ -1,3 +1,10 @@
+qubes-video-companion (4.3.1-1) unstable; urgency=medium
+
+  * rpm: restart qubesd after installing
+  * workaround pylint false positive
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 04 Jan 2026 15:22:45 +0100
+
 qubes-video-companion (4.3.0-1) unstable; urgency=medium
 
   * Simplify arg parsing
