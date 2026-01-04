@@ -74,6 +74,11 @@ pushd core3ext
 popd
 %endif
 
+%posttrans
+
+# restart to load new addon version
+systemctl -q try-restart qubesd.service 2>/dev/null || :
+
 %files
 %{_licensedir}/qubes-video-companion/LICENSE
 %{_docdir}/qubes-video-companion/README.md
