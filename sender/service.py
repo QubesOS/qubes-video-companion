@@ -131,6 +131,9 @@ class Service:
         width, height, fps, extra_params = self.parameters()
         sys.stdout.buffer.write(struct.pack("=HHH", width, height, fps))
         sys.stdout.buffer.flush()
+        # pylint is confused about gi-imported objects, Gst.init() is a class
+        # method
+        # pylint: disable=no-value-for-parameter
         Gst.init()
         element = self._element = Gst.parse_launchv(
             self.pipeline(width, height, fps, **extra_params)
