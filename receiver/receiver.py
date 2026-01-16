@@ -89,11 +89,11 @@ def read_video_parameters() -> (int, int, int):
     del untrusted_input
 
     if (
-        untrusted_width > 4096
-        or untrusted_height > 4096
+        untrusted_width > 7680
+        or untrusted_height > 4320
         or untrusted_fps > 4096
     ):
-        raise RuntimeError("excessive width, height, and/or fps")
+        raise RuntimeError("excessive width, height, and/or fps (max 8K: 7680x4320)")
     width, height, fps = untrusted_width, untrusted_height, untrusted_fps
     del untrusted_width, untrusted_height, untrusted_fps
 
