@@ -8,4 +8,4 @@ set -eu
 true "${XDG_RUNTIME_DIR:="/run/user/$(id -u)"}"
 true "${DBUS_SESSION_BUS_ADDRESS:="unix:path=${XDG_RUNTIME_DIR}/bus"}"
 export DISPLAY=:0 XDG_RUNTIME_DIR DBUS_SESSION_BUS_ADDRESS
-exec python3 -- /usr/share/qubes-video-companion/sender/screenshare.py
+exec /usr/bin/python3 -- /usr/share/qubes-video-companion/sender/screenshare.py
