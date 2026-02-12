@@ -1,3 +1,13 @@
+qubes-video-companion (4.3.2-1) unstable; urgency=medium
+
+  [ Apex Flex ]
+  * screenshare: raise max video dimensions to 8K
+
+  [ seven beep ]
+  * fix(qubes-rpc): use system python3 in rpc calls
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 12 Feb 2026 02:13:49 +0100
+
 qubes-video-companion (4.3.1-1) unstable; urgency=medium
 
   * rpm: restart qubesd after installing
