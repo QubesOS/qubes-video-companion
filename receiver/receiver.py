@@ -15,10 +15,11 @@ def sdnotify(msg):
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
     addr = os.getenv("NOTIFY_SOCKET")
     if addr[0] == "@":
-        addr = '\0' + addr[1:]
+        addr = "\0" + addr[1:]
     sock.connect(addr)
     sock.sendall(msg)
     sock.close()
+
 
 def main(argv) -> NoReturn:
     dev_path = "/dev/video0"
@@ -93,7 +94,9 @@ def read_video_parameters() -> (int, int, int):
         or untrusted_height > 4320
         or untrusted_fps > 4096
     ):
-        raise RuntimeError("excessive width, height, and/or fps (max 8K: 7680x4320)")
+        raise RuntimeError(
+            "excessive width, height, and/or fps (max 8K: 7680x4320)"
+        )
     width, height, fps = untrusted_width, untrusted_height, untrusted_fps
     del untrusted_width, untrusted_height, untrusted_fps
 
