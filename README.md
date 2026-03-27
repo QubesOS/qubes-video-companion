@@ -166,8 +166,6 @@ The user interface components are created with GTK 3, GObject and AppIndicator (
 
 ### Why can I perceive some latency in the video playback?
 
-**This issue will likely be fixed by switching entirely to MJPEG instead of the raw YUV video format for streaming video. See issues [#16](https://github.com/elliotkillick/qubes-video-companion/issues/16) and [#13](https://github.com/elliotkillick/qubes-video-companion/issues/13).**
-
 This means the CPU is at its limit (nearing or at 100% usage). To check this, install GNOME System Monitor (packaged as `gnome-system-monitor`) in the video receiving VM and assess the CPU usage for each of the processes and overall in the resources graph.
 
 It's important to remember that for security reasons, qubes do not have access to the GPU and therefore, must rely entirely on the CPU even for graphical workloads.
