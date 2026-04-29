@@ -67,6 +67,10 @@ case "$video_source" in
         qvc_service="qvc.Webcam"
         ;;
     screenshare)
+        if [[ -n "$resolution" ]]; then
+            echo "$name: Cannot use --resolution together with screenshare" >&2
+            exit 1
+        fi
         qvc_service="qvc.ScreenShare"
         ;;
     *)
