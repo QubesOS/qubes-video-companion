@@ -1,3 +1,16 @@
+qubes-video-companion (4.3.3-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Fix formatting
+
+  [ Devansh7006 ]
+  * docs: remove outdated MJPEG reference from README
+
+  [ heinrich5991 ]
+  * Reject `--resolution` together with `screenshare`
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 04 May 2026 01:45:55 +0200
+
 qubes-video-companion (4.3.2-1) unstable; urgency=medium
 
   [ Apex Flex ]
