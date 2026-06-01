@@ -97,7 +97,7 @@ class WebcamDevice(qubes.device_protocol.DeviceInfo):
         )
 
     def _get_parent_device(self, port: Port):
-        if not port.backend_domain or not port.backend_domain.is_running():
+        if not port.backend_domain or not getattr(port.backend_domain, "untrusted_qdb"):
             return None
         untrusted_parent_info = port.backend_domain.untrusted_qdb.read(
             f"/webcam-devices/{port.port_id}/parent"
@@ -129,7 +129,7 @@ class WebcamDevice(qubes.device_protocol.DeviceInfo):
 
     @property
     def attachment(self):
-        if not self.backend_domain.is_running():
+        if not getattr(self.backend_domain, "untrusted_qdb"):
             return None
         untrusted_connected_to = self.backend_domain.untrusted_qdb.read(
             self._qdb_path + "/connected-to"
@@ -277,7 +277,7 @@ class WebcamDeviceExtension(qubes.ext.Extension):
 
     @qubes.ext.handler("device-list:webcam")
     def on_device_list_webcam(self, vm, event):
-        if not vm.is_running() or not hasattr(vm, "untrusted_qdb"):
+        if not getattr(vm, "untrusted_qdb"):
             return
         untrusted_devices = vm.untrusted_qdb.list("/webcam-devices/")
 
@@ -303,7 +303,7 @@ class WebcamDeviceExtension(qubes.ext.Extension):
     @qubes.ext.handler("device-get:webcam")
     def on_device_get_webcam(self, vm, event, port_id):
         # pylint: disable=unused-argument
-        if not vm.is_running():
+        if not getattr(vm, "untrusted_qdb"):
             return
 
         if vm.untrusted_qdb.list("/webcam-devices/" + port_id):
@@ -312,7 +312,7 @@ class WebcamDeviceExtension(qubes.ext.Extension):
     @staticmethod
     def get_all_devices(app):
         for vm in app.domains:
-            if not vm.is_running() or not hasattr(vm, "devices"):
+            if not getattr(vm, "untrusted_qdb") or not hasattr(vm, "devices"):
                 continue
 
             for dev in vm.devices["webcam"]:
@@ -322,7 +322,7 @@ class WebcamDeviceExtension(qubes.ext.Extension):
     @qubes.ext.handler("device-list-attached:webcam")
     def on_device_list_attached(self, vm, event, **kwargs):
         # pylint: disable=unused-argument
-        if not vm.is_running():
+        if not getattr(vm, "untrusted_qdb"):
             return
 
         for dev in self.get_all_devices(vm.app):
@@ -346,7 +346,7 @@ class WebcamDeviceExtension(qubes.ext.Extension):
                         "Unsupported option: '{}'".format(option)
                     )
 
-        if not vm.is_running() or vm.qid == 0:
+        if not getattr(vm, "untrusted_qdb") or vm.qid == 0:
             # print(f"Qube is not running, skipping attachment of {device}",
             #       file=sys.stderr)
             return
@@ -397,7 +397,7 @@ class WebcamDeviceExtension(qubes.ext.Extension):
     @qubes.ext.handler("device-pre-detach:webcam")
     async def on_device_detach_webcam(self, vm, event, port):
         # pylint: disable=unused-argument
-        if not vm.is_running() or vm.qid == 0:
+        if not getattr(vm, "untrusted_qdb") or vm.qid == 0:
             return
 
         for attached, _options in self.on_device_list_attached(vm, event):
