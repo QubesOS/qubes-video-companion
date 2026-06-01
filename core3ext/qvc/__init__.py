@@ -21,6 +21,7 @@ device_re = re.compile(r"\A[a-z0-9/-]{1,64}\Z")
 connected_to_re = re.compile(rb"^[a-zA-Z][a-zA-Z0-9_.-]*$")
 format_re = re.compile(r"\A^[1-9][0-9]{0,3}x[1-9][0-9]{0,3}x[1-9][0-9]{0,2}\Z")
 
+
 class WebcamDevice(qubes.device_protocol.DeviceInfo):
     def __init__(self, port: qubes.device_protocol.Port):
         if port.devclass != "webcam":
@@ -109,16 +110,14 @@ class WebcamDevice(qubes.device_protocol.DeviceInfo):
         if not parent_ident:
             return None
         try:
-            return port.backend_domain.devices[parent_devclass][
-                parent_ident
-            ]
+            return port.backend_domain.devices[parent_devclass][parent_ident]
         except KeyError:
             return qubes.device_protocol.UnknownDevice(
                 qubes.device_protocol.Port(
-                    port.backend_domain, parent_ident,
-                    devclass=parent_devclass
+                    port.backend_domain, parent_ident, devclass=parent_devclass
                 )
             )
+
     @property
     def parent_device(self) -> Optional[qubes.device_protocol.DeviceInfo]:
         """
@@ -166,7 +165,9 @@ class WebcamDevice(qubes.device_protocol.DeviceInfo):
             )
             formats = []
             for _, untrusted_format in untrusted_formats.items():
-                untrusted_format = untrusted_format.decode("ascii", errors="strict")
+                untrusted_format = untrusted_format.decode(
+                    "ascii", errors="strict"
+                )
                 if not format_re.match(untrusted_format):
                     self.backend_domain.log.warning("Invalid format")
                     continue
@@ -280,8 +281,10 @@ class WebcamDeviceExtension(qubes.ext.Extension):
             return
         untrusted_devices = vm.untrusted_qdb.list("/webcam-devices/")
 
-        untrusted_idents = set(untrusted_path.split("/", 3)[2]
-                               for untrusted_path in untrusted_devices)
+        untrusted_idents = set(
+            untrusted_path.split("/", 3)[2]
+            for untrusted_path in untrusted_devices
+        )
         for untrusted_ident in untrusted_idents:
             if not name_re.match(untrusted_ident):
                 msg = (
@@ -339,7 +342,9 @@ class WebcamDeviceExtension(qubes.ext.Extension):
                         raise QubesException("Invalid format value")
                     arg += "+" + value.replace("x", "+")
                 else:
-                    raise QubesException("Unsupported option: '{}'".format(option))
+                    raise QubesException(
+                        "Unsupported option: '{}'".format(option)
+                    )
 
         if not vm.is_running() or vm.qid == 0:
             # print(f"Qube is not running, skipping attachment of {device}",
@@ -353,27 +358,37 @@ class WebcamDeviceExtension(qubes.ext.Extension):
                 f"Device {device} already attached to {device.attachment}"
             )
 
-        if not vm.features.check_with_template("supported-rpc.qvc.WebcamAttach", False):
-            raise QVCNotInstalled("qubes-video-companion not installed in the VM")
+        if not vm.features.check_with_template(
+            "supported-rpc.qvc.WebcamAttach", False
+        ):
+            raise QVCNotInstalled(
+                "qubes-video-companion not installed in the VM"
+            )
 
         # update the cache before the call, to avoid sending duplicated events
         # (one on qubesdb watch and the other by the caller of this method)
         self.devices_cache[device.backend_domain.name][device.port_id] = vm
 
         # set qrexec policy to allow this device
-        with allow_qrexec_call("qvc.Webcam", "+" + arg, f"uuid:{vm.uuid}", f"uuid:{device.backend_domain.uuid}"):
+        with allow_qrexec_call(
+            "qvc.Webcam",
+            "+" + arg,
+            f"uuid:{vm.uuid}",
+            f"uuid:{device.backend_domain.uuid}",
+        ):
             # and actual attach
             try:
                 await vm.run_service_for_stdio(
                     "qvc.WebcamAttach",
                     user="root",
-                    input=f"{device.backend_domain.name} "
-                    f"{arg}\n".encode(),
+                    input=f"{device.backend_domain.name} " f"{arg}\n".encode(),
                 )
             except subprocess.CalledProcessError as e:
                 # pylint: disable=raise-missing-from
                 if e.returncode == 127:
-                    raise QVCNotInstalled("qubes-video-companion not installed in the VM")
+                    raise QVCNotInstalled(
+                        "qubes-video-companion not installed in the VM"
+                    )
                 raise QubesException(
                     f"Device attach failed: {sanitize_stderr_for_log(e.output)}"
                     f" {sanitize_stderr_for_log(e.stderr)}"
@@ -389,9 +404,7 @@ class WebcamDeviceExtension(qubes.ext.Extension):
             if attached.port == port:
                 break
         else:
-            raise QubesException(
-                f"Device {port} not connected to VM {vm.name}"
-            )
+            raise QubesException(f"Device {port} not connected to VM {vm.name}")
 
         # update the cache before the call, to avoid sending duplicated events
         # (one on qubesdb watch and the other by the caller of this method)
@@ -420,7 +433,9 @@ class WebcamDeviceExtension(qubes.ext.Extension):
                     if not format_re.match(value):
                         raise QubesException("Invalid format value")
                 else:
-                    raise QubesException("Unsupported option: '{}'".format(option))
+                    raise QubesException(
+                        "Unsupported option: '{}'".format(option)
+                    )
 
     @qubes.ext.handler("domain-start")
     async def on_domain_start(self, vm, _event, **_kwargs):
