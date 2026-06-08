@@ -23,8 +23,12 @@ class Webcam(Service):
     untrusted_requested_fps: int
 
     def __init__(self, *, untrusted_arg: str):
-        self.port_id = "dev-video0"
+        #self.port_id = "dev-video0"
+        # By default use the port id with highest number from QubesDB
+        self.port_id = self.get_highest_port_id()
 
+        # However, if an argument is used, check if it starts with dev and if
+        # so, use it as the port id
         if untrusted_arg:
             if untrusted_arg.startswith("dev-"):
                 # first arg may be a port id, and then optional resolution arg
@@ -35,11 +39,12 @@ class Webcam(Service):
                 else:
                     untrusted_port_id, untrusted_arg = untrusted_arg, None
 
-                # currently support only a single port: "dev-video0"
-                if untrusted_port_id != "dev-video0":
+                supported_port_ids = ["dev-video0", "dev-video2", "dev-video4", "dev-video6", "dev-video8"]
+                if untrusted_port_id not in supported_port_ids:
                     print(f"Unsupported webcam port ({untrusted_port_id}), "
-                           "only 'dev-video0' supported", file=sys.stderr)
+                           "only 'dev-video0/2/4/6/8' supported", file=sys.stderr)
                 self.port_id = untrusted_port_id
+
 
         if untrusted_arg:
             def parse_int(untrusted_decimal: bytes) -> int:
@@ -95,7 +100,7 @@ class Webcam(Service):
             rb"fps\)\Z"
         )
         proc = subprocess.run(
-            ("v4l2-ctl", "--list-formats-ext"),
+            ("v4l2-ctl", "--list-formats-ext", f"--device=/dev/video{self.port_id[-1]}"),
             stdout=subprocess.PIPE,
             check=True,
             env={"PATH": "/bin:/usr/bin", "LC_ALL": "C"},
@@ -165,6 +170,7 @@ class Webcam(Service):
                     )
         return [
             "v4l2src",
+            f"device=/dev/video{self.port_id[-1]}",
             "!",
             "queue",
             *convert,
@@ -191,6 +197,17 @@ class Webcam(Service):
         qdb.write(f"/webcam-devices/{self.port_id}/connected-to", remote_domain)
         qdb.write("/webcam-devices", "")
         atexit.register(self._cleanup_connect_state)
+
+    def get_highest_port_id(self):
+        qdb = qubesdb.QubesDB()
+        qdb_device_entries = qdb.list("/webcam-devices")
+        port_ids = []
+        pattern = r"(?:/webcam-devices/dev-video)(\d{1})(?:/connected-to)"
+        for entry in qdb_device_entries:
+            match = re.search(pattern, entry)
+            if match:
+                port_ids.append(int(match.group(1)))
+        return f"dev-video{str(max(port_ids))}"
 
 
 if __name__ == "__main__":
