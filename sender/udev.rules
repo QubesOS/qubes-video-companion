@@ -1,2 +1,9 @@
-# for now publish only /dev/video0
-KERNEL=="video0", RUN+="/usr/share/qubes-video-companion/sender/udev-handler"
+# Publish only the first 5 webcam/video devices:
+# - /dev/video0
+# - /dev/video2
+# - /dev/video4
+# - /dev/video6
+# - /dev/video8
+# Explanation why only even numbers are used: It seems video channels are accompanied with a metadata channel
+# e.g. /dev/video1 accompanies /dev/video0. Therefore, the second webcam's video data is at /dev/video2.
+KERNEL=="video[02468]", RUN+="/usr/share/qubes-video-companion/sender/udev-handler"
