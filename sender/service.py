@@ -111,7 +111,7 @@ class Service:
     def validate_qube_names(target_domain: str, remote_domain: str) -> NoReturn:
         import re
 
-        qube_re = re.compile("^[A-Za-z][A-Za-z0-9_-]{1,30}$")
+        qube_re = re.compile("^[A-Za-z][A-Za-z0-9_-]{0,30}$")
         if not qube_re.match(target_domain):
             print(
                 "Invalid target qube name %r, failing" % target_domain,
