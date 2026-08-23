@@ -1,0 +1,47 @@
+# The Qubes OS Project, https://www.qubes-os.org
+
+pkgname=qubes-video-companion
+pkgver=@VERSION@
+pkgrel=@REL@
+pkgdesc="Securely stream webcams and share screens across Qubes OS virtual machines"
+arch=(any)
+url="https://github.com/QubesOS/qubes-video-companion"
+license=(MIT)
+depends=(
+    acl
+    bash
+    gst-plugins-good
+    gstreamer
+    libayatana-appindicator
+    libnotify
+    notification-daemon
+    python
+    python-gobject
+    qubes-db-vm
+    qubes-vm-qrexec
+    sudo
+    systemd
+    v4l-utils
+)
+makedepends=(
+    make
+    pandoc-cli
+)
+optdepends=(
+    'v4l2loopback-dkms: video receiver support when using an in-VM kernel'
+)
+_pkgnvr="${pkgname}-${pkgver}-${pkgrel}"
+source=("${_pkgnvr}.tar.gz")
+sha256sums=(SKIP)
+
+build() {
+    cd "${_pkgnvr}"
+    make build
+}
+
+package() {
+    cd "${_pkgnvr}"
+    make DESTDIR="${pkgdir}" install-vm install-license
+}
+
+# vim:set ts=4 sw=4 et:
