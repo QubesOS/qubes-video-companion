@@ -196,7 +196,6 @@ This project is the product of an independent effort that is not officially endo
 - [Cheese](https://wiki.gnome.org/Apps/Cheese)
 - Chromium-based browsers (e.g. Brave and Google Chrome)
 - Firefox
-    - This [patch](https://github.com/umlaeute/v4l2loopback/pull/435) for `v4l2loopback` is necessary to get this working
 - Open Broadcaster Software (OBS)
     - For the `Video Capture Device (V4L2)` source click on the `Properties` settings cog and use video format `Planar YUV 4:2:0` (as opposed to `YV12 (Emulated)`) and uncheck `Use buffering` for optimal performance
 - Zoom
