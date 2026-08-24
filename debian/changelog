@@ -1,3 +1,14 @@
+qubes-video-companion (4.3.4-1) unstable; urgency=medium
+
+  [ Janik Besendorf ]
+  * docs: remove obsolete v4l2loopback patch note
+  * build: add Arch Linux VM package
+
+  [ Marek Marczykowski-Górecki ]
+  * tests: use qrexec service presence to check if QVC is installed
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 24 Aug 2026 21:43:20 +0200
+
 qubes-video-companion (4.3.3-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
