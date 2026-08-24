@@ -18,9 +18,9 @@ class TC_00_QVCTest(qubes.tests.extra.ExtraTestCase):
             self.skipTest("Cannot load 'vivid' module on Whonix")
         self.source, self.view = self.create_vms(
             ["source", "view"])
-        self.source.start()
-        if self.source.run('which qubes-video-companion', wait=True) != 0:
+        if not self.source.features.check_with_template("supported-rpc.qvc.Webcam", ""):
             self.skipTest('qubes-video-companion not installed')
+        self.source.start()
 
     def wait_for_video0(self, vm):
         retcode = vm.run(
