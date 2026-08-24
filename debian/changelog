@@ -1,3 +1,13 @@
+qubes-video-companion (4.3.5-1) unstable; urgency=medium
+
+  [ Janik Besendorf ]
+  * fix: allow single-letter qube names
+
+  [ besendorf ]
+  * Update sender/service.py
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 24 Aug 2026 21:44:46 +0200
+
 qubes-video-companion (4.3.4-1) unstable; urgency=medium
 
   [ Janik Besendorf ]
